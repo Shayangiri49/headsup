@@ -437,17 +437,26 @@ class _JobDetailsPanelState extends State<JobDetailsPanel>
                           ),
                         ),
                         IconButton(
-                          onPressed: () {
-                            // Handle share
-                            print('Share pressed');
-                          },
-                          icon: const Icon(Icons.share, color: textDark),
+                        onPressed: () async {
+                        final shareText =
+                        '${widget.job.title} at ${widget.job.company}\nLocation: ${widget.job.location}\nSalary: ${widget.job.salary}\nType: ${widget.job.type}\n\n${widget.job.description}';
+                        // ignore: use_build_context_synchronously
+                        await showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                        title: const Text('Share'),
+                        content: Text('Sharing...'),
                         ),
-                      ],
-                    ),
-                  ),
-                  // Job Info
-                  Padding(
+                        );
+                        // You should use Share.share(shareText) from share_plus package in real app
+                        },
+                        icon: const Icon(Icons.share, color: textDark),
+                        ),
+                        ],
+                        ),
+                        ),
+                        // Job Info
+                        Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
                       children: [
@@ -501,29 +510,21 @@ class _JobDetailsPanelState extends State<JobDetailsPanel>
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Description Toggle
+                  // Description
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        const Text(
-                          'Description',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: textDark,
-                          ),
-                        ),
-                        const Spacer(),
-                        Switch(
-                          value: true,
-                          onChanged: (value) {
-                            // Handle description toggle
-                          },
-                          activeColor: primaryBlue,
-                        ),
-                      ],
-                    ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                  children: [
+                  const Text(
+                  'Description',
+                  style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: textDark,
+                  ),
+                  ),
+                  ],
+                  ),
                   ),
                   // About the job
                   Padding(

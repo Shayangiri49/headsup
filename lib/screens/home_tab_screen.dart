@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../utils/app_colors.dart';
 import '../services/notification_service.dart' show NotificationItem, NotificationType, NotificationService;
 import 'package:fl_chart/fl_chart.dart';
 import '../widgets/candidate_popup_form.dart';
+import '../../main.dart' show themeModeNotifier;
 
 class HomeTabScreen extends StatefulWidget {
   const HomeTabScreen({super.key});
@@ -104,7 +104,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
   Widget build(BuildContext context) {
     final currentData = performanceData[selectedPeriod]!;
     return Scaffold(
-      backgroundColor: backgroundWhite,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -116,19 +116,19 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor: primaryBlue.withOpacity(0.1),
-                    child: const Icon(
+                    backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    child: Icon(
                       Icons.person,
-                      color: primaryBlue,
+                      color: Theme.of(context).colorScheme.primary,
                       size: 24,
                     ),
                   ),
-                  const Text(
+                  Text(
                     'Services',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: textDark,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                   Row(
@@ -140,9 +140,9 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                           return Stack(
                             children: [
                               IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.notifications_outlined,
-                                  color: textDark,
+                                  color: Theme.of(context).iconTheme.color,
                                   size: 24,
                                 ),
                                 onPressed: () => _showNotifications(context),
@@ -176,9 +176,9 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.settings_outlined,
-                          color: textDark,
+                          color: Theme.of(context).iconTheme.color,
                           size: 24,
                         ),
                         onPressed: () => _showSettingsBottomSheet(context),
@@ -199,7 +199,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: backgroundWhite,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -232,12 +232,12 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                             child: ElevatedButton(
                               onPressed: _addCandidate,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryBlue,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                              backgroundColor: const Color(0xFF4A90E2),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              ),
                               ),
                               child: const Text(
                                 'ADD CANDIDATE',
@@ -253,29 +253,32 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     ),
                     const SizedBox(height: 24),
                     _buildSectionCard(
-                      title: 'Targets For Today - ${DateTime.now().day}/${DateTime.now().month}',
+                      context,
+                      title: 'Targets For Today',
                       child: Column(
                         children: [
-                          _buildTargetItem('Target Interview Scheduled', '7/10', Colors.green),
+                          _buildTargetItem(context, 'Target Interview Scheduled', '7/10', Colors.green),
                           const SizedBox(height: 12),
-                          _buildTargetItem('In Progress', 'GFE Calling (Telecaller: Abinayhen)', Colors.orange),
+                          _buildTargetItem(context, 'In Progress', 'GFE Calling (Telecaller: Abinayhen)', Colors.orange),
                         ],
                       ),
                     ),
                     const SizedBox(height: 24),
                     _buildSectionCard(
+                      context,
                       title: 'Performance',
                       child: Column(
                         children: [
                           Row(
                             children: [
-                              Expanded(child: _buildPeriodButton('Daily')),
-                              Expanded(child: _buildPeriodButton('Weekly')),
-                              Expanded(child: _buildPeriodButton('Monthly')),
+                              Expanded(child: _buildPeriodButton(context, 'Daily')),
+                              Expanded(child: _buildPeriodButton(context, 'Weekly')),
+                              Expanded(child: _buildPeriodButton(context, 'Monthly')),
                             ],
                           ),
                           const SizedBox(height: 20),
                           _buildPerformanceMetric(
+                            context,
                             '${currentData['joinings']} Joinings',
                             'This ${selectedPeriod.toLowerCase()}',
                           ),
@@ -293,7 +296,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                                         if (value.toInt() < currentData['labels'].length) {
                                           return Text(
                                             currentData['labels'][value.toInt()],
-                                            style: const TextStyle(fontSize: 10),
+                                            style: TextStyle(fontSize: 10, color: Theme.of(context).textTheme.bodyMedium?.color),
                                           );
                                         }
                                         return const Text('');
@@ -321,14 +324,14 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                                       ),
                                     ),
                                     isCurved: true,
-                                    color: primaryBlue,
+                                    color: Theme.of(context).colorScheme.primary,
                                     barWidth: 3,
                                     dotData: FlDotData(
                                       show: true,
                                       getDotPainter: (spot, percent, barData, index) {
                                         return FlDotCirclePainter(
                                           radius: 4,
-                                          color: primaryBlue,
+                                          color: Theme.of(context).colorScheme.primary,
                                           strokeWidth: 2,
                                           strokeColor: Colors.white,
                                         );
@@ -336,7 +339,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                                     ),
                                     belowBarData: BarAreaData(
                                       show: true,
-                                      color: primaryBlue.withOpacity(0.1),
+                                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                                     ),
                                   ),
                                 ],
@@ -345,6 +348,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                           ),
                           const SizedBox(height: 20),
                           _buildPerformanceMetric(
+                            context,
                             '${currentData['closures']} Closures',
                             '',
                           ),
@@ -353,18 +357,20 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     ),
                     const SizedBox(height: 24),
                     _buildSectionCard(
+                      context,
                       title: 'Attendance',
                       child: Column(
                         children: [
                           Row(
                             children: [
-                              Expanded(child: _buildPeriodButton('Daily', isAttendance: true)),
-                              Expanded(child: _buildPeriodButton('Weekly', isAttendance: true)),
-                              Expanded(child: _buildPeriodButton('Monthly', isAttendance: true)),
+                              Expanded(child: _buildPeriodButton(context, 'Daily', isAttendance: true)),
+                              Expanded(child: _buildPeriodButton(context, 'Weekly', isAttendance: true)),
+                              Expanded(child: _buildPeriodButton(context, 'Monthly', isAttendance: true)),
                             ],
                           ),
                           const SizedBox(height: 20),
                           _buildPerformanceMetric(
+                            context,
                             '${currentData['attendance']} days',
                             'This ${selectedPeriod.toLowerCase()}',
                           ),
@@ -382,7 +388,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                                         if (value.toInt() < currentData['labels'].length) {
                                           return Text(
                                             currentData['labels'][value.toInt()],
-                                            style: const TextStyle(fontSize: 10),
+                                            style: TextStyle(fontSize: 10, color: Theme.of(context).textTheme.bodyMedium?.color),
                                           );
                                         }
                                         return const Text('');
@@ -407,7 +413,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                                     barRods: [
                                       BarChartRodData(
                                         toY: currentData['attendanceData'][index].toDouble(),
-                                        color: primaryBlue.withOpacity(0.7),
+                                        color: Theme.of(context).colorScheme.primary.withOpacity(0.7),
                                         width: 20,
                                         borderRadius: const BorderRadius.only(
                                           topLeft: Radius.circular(4),
@@ -433,12 +439,12 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
     );
   }
 
-  Widget _buildSectionCard({required String title, required Widget child}) {
+  Widget _buildSectionCard(BuildContext context, {required String title, required Widget child}) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: backgroundWhite,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -453,10 +459,10 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: textDark,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 16),
@@ -466,7 +472,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
     );
   }
 
-  Widget _buildTargetItem(String label, String value, Color color) {
+  Widget _buildTargetItem(BuildContext context, String label, String value, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -479,10 +485,10 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: textDark,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
               ),
             ),
           ),
@@ -499,7 +505,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
     );
   }
 
-  Widget _buildPeriodButton(String period, {bool isAttendance = false}) {
+  Widget _buildPeriodButton(BuildContext context, String period, {bool isAttendance = false}) {
     final isSelected = selectedPeriod == period;
     return GestureDetector(
       onTap: () {
@@ -510,7 +516,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? primaryBlue : Colors.transparent,
+          color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(
@@ -519,31 +525,31 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: isSelected ? Colors.white : textSecondary,
+            color: isSelected ? Colors.white : Theme.of(context).textTheme.bodyMedium?.color,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildPerformanceMetric(String title, String subtitle) {
+  Widget _buildPerformanceMetric(BuildContext context, String title, String subtitle) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: textDark,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
           ),
         ),
         if (subtitle.isNotEmpty)
           Text(
             subtitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: textSecondary,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
           ),
       ],
@@ -574,12 +580,12 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Notifications',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: textDark,
+                              color: Theme.of(context).textTheme.bodyLarge?.color,
                             ),
                           ),
                           if (notifications.isNotEmpty)
@@ -594,21 +600,21 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                       const SizedBox(height: 20),
                       Expanded(
                         child: notifications.isEmpty
-                            ? const Center(
+                            ? Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(
                                       Icons.notifications_none,
                                       size: 64,
-                                      color: textSecondary,
+                                      color: Theme.of(context).textTheme.bodyMedium?.color,
                                     ),
-                                    SizedBox(height: 16),
+                                    const SizedBox(height: 16),
                                     Text(
                                       'No notifications yet',
                                       style: TextStyle(
                                         fontSize: 16,
-                                        color: textSecondary,
+                                        color: Theme.of(context).textTheme.bodyMedium?.color,
                                       ),
                                     ),
                                   ],
@@ -619,7 +625,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                                 itemCount: notifications.length,
                                 itemBuilder: (context, index) {
                                   final notification = notifications[index];
-                                  return _buildNotificationItem(notification);
+                                  return _buildNotificationItem(context, notification);
                                 },
                               ),
                       ),
@@ -659,37 +665,50 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'Settings',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: textDark,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
               const SizedBox(height: 20),
+              SwitchListTile(
+                title: const Text('Dark Mode'),
+                value: themeModeNotifier.value == ThemeMode.dark,
+                onChanged: (value) {
+                  themeModeNotifier.value = value ? ThemeMode.dark : ThemeMode.light;
+                },
+                secondary: Icon(
+                  themeModeNotifier.value == ThemeMode.dark
+                      ? Icons.dark_mode
+                      : Icons.light_mode,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
               ListTile(
-                leading: const Icon(Icons.account_circle_outlined, color: primaryBlue),
-                title: const Text('Account Settings'),
-                trailing: const Icon(Icons.chevron_right, color: textSecondary),
+                leading: Icon(Icons.account_circle_outlined, color: Theme.of(context).colorScheme.primary),
+                title: Text('Account Settings', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)),
+                trailing: Icon(Icons.chevron_right, color: Theme.of(context).iconTheme.color),
                 onTap: () {
                   Navigator.pop(context);
                   // Add your account settings navigation here
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.notifications_outlined, color: primaryBlue),
-                title: const Text('Notifications'),
-                trailing: const Icon(Icons.chevron_right, color: textSecondary),
+                leading: Icon(Icons.notifications_outlined, color: Theme.of(context).colorScheme.primary),
+                title: Text('Notifications', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)),
+                trailing: Icon(Icons.chevron_right, color: Theme.of(context).iconTheme.color),
                 onTap: () {
                   Navigator.pop(context);
                   // Add your notifications navigation here
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.help_outline, color: primaryBlue),
-                title: const Text('Help & Support'),
-                trailing: const Icon(Icons.chevron_right, color: textSecondary),
+                leading: Icon(Icons.help_outline, color: Theme.of(context).colorScheme.primary),
+                title: Text('Help & Support', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)),
+                trailing: Icon(Icons.chevron_right, color: Theme.of(context).iconTheme.color),
                 onTap: () {
                   Navigator.pop(context);
                   // Add your help & support navigation here
@@ -719,7 +738,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
   }
 
   // Notification item builder
-  Widget _buildNotificationItem(NotificationItem notification) {
+  Widget _buildNotificationItem(BuildContext context, NotificationItem notification) {
     IconData getIcon() {
       switch (notification.type) {
         case NotificationType.interview:
@@ -742,14 +761,14 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
         case NotificationType.reached:
           return Colors.red;
         default:
-          return primaryBlue;
+          return Theme.of(context).colorScheme.primary;
       }
     }
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       elevation: notification.isRead ? 1 : 3,
-      color: notification.isRead ? null : Colors.blue.withOpacity(0.05),
+      color: notification.isRead ? null : Theme.of(context).colorScheme.primary.withOpacity(0.05),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: getColor().withOpacity(0.1),
@@ -763,7 +782,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
           notification.title,
           style: TextStyle(
             fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
-            color: textDark,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
           ),
         ),
         subtitle: Column(
@@ -771,13 +790,13 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
           children: [
             Text(
               notification.message,
-              style: const TextStyle(color: textSecondary),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
             ),
             const SizedBox(height: 4),
             Text(
               _formatTime(notification.timestamp),
-              style: const TextStyle(
-                color: textSecondary,
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color,
                 fontSize: 12,
               ),
             ),
@@ -788,8 +807,8 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
             : Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
-                  color: primaryBlue,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
                   shape: BoxShape.circle,
                 ),
               ),

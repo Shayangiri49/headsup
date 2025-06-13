@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../services/notification_service.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ApplicationsTabScreen extends StatefulWidget {
   const ApplicationsTabScreen({super.key});
@@ -365,7 +366,7 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () => _openWhatsApp(application['whatsapp']),
-                    icon: const Icon(Icons.chat, size: 18),
+                    icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 18),
                     label: const Text(''),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF25D366), // WhatsApp green
