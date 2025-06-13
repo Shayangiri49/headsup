@@ -125,7 +125,8 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                       icon: const Icon(Icons.more_vert, color: textSecondary),
                       onSelected: (String value) {
                         if (value == 'remove') {
-                          _removeCandidate(index);
+                          final allIndex = allCandidates.indexOf(candidate);
+                          _removeCandidate(allIndex);
                         }
                       },
                       itemBuilder: (BuildContext context) => [
@@ -456,28 +457,24 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
 
   // Remove candidate function
   void _removeCandidate(int index) {
-    Navigator.of(context).pop(); // Close the popup first
-    
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Text('Remove Candidate'),
           content: Text('Are you sure you want to remove ${allCandidates[index]['name']} from the candidates list?'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.of(dialogContext).pop(),
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
                 setState(() {
                   final removedCandidate = allCandidates[index];
                   allCandidates.removeAt(index);
-                  _filterCandidates(_searchQuery); // Refresh filtered list
-                  
-                  // Show success message
+                  _filterCandidates(_searchQuery);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('${removedCandidate['name']} has been removed'),
@@ -495,6 +492,8 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                     ),
                   );
                 });
+                Navigator.of(dialogContext).pop(); // Close confirmation dialog
+                Navigator.of(dialogContext).pop(); // Close candidate details dialog
               },
               child: const Text('Remove', style: TextStyle(color: Colors.red)),
             ),
