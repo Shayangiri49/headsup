@@ -130,16 +130,17 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                         }
                       },
                       itemBuilder: (BuildContext context) => [
-                        const PopupMenuItem<String>(
-                          value: 'remove',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete_outline, color: Colors.red, size: 20),
-                              SizedBox(width: 8),
-                              Text('Remove Candidate'),
-                            ],
+                        if (currentUserRole == 'admin')
+                          const PopupMenuItem<String>(
+                            value: 'remove',
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                SizedBox(width: 8),
+                                Text('Remove Candidate'),
+                              ],
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ],
@@ -741,7 +742,12 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                 setState(() {
                   allCandidates[index]['status'] = 'reached';
                 });
-                
+                _notificationService.addNotification(
+                  title: 'Candidate Reached',
+                  message: '${allCandidates[index]['name']} marked as reached',
+                  type: NotificationType.reached,
+                  candidateName: allCandidates[index]['name'],
+                );
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('${allCandidates[index]['name']} marked as reached'),

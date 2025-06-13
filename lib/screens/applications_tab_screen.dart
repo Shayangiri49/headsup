@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../services/notification_service.dart';
+import '../data/applications_data.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../data/user_role.dart';
@@ -16,64 +17,8 @@ class ApplicationsTabScreen extends StatefulWidget {
 class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
   final NotificationService _notificationService = NotificationService();
   
-  // Sample applications data
-  List<Map<String, dynamic>> applications = [
-    {
-      'id': 1,
-      'company': 'Tech Innovators Inc.',
-      'position': 'Senior Software Engineer',
-      'candidateName': 'Tanvi Mandal',
-      'appliedDate': 'Applied 2 days ago',
-      'status': 'pending', // pending, selected, rejected, joined
-      'phone': '+91 9876543210',
-      'whatsapp': '+91 9876543210',
-      'avatar': 'T',
-    },
-    {
-      'id': 2,
-      'company': 'Tech Innovators Inc.',
-      'position': 'Senior Software Engineer',
-      'candidateName': 'Tanvi Mandal',
-      'appliedDate': 'Applied 2 days ago',
-      'status': 'selected',
-      'phone': '+91 9876543211',
-      'whatsapp': '+91 9876543211',
-      'avatar': 'T',
-    },
-    {
-      'id': 3,
-      'company': 'Tech Innovators Inc.',
-      'position': 'Senior Software Engineer',
-      'candidateName': 'Tanvi Mandal',
-      'appliedDate': 'Applied 2 days ago',
-      'status': 'joined',
-      'phone': '+91 9876543212',
-      'whatsapp': '+91 9876543212',
-      'avatar': 'T',
-    },
-    {
-      'id': 4,
-      'company': 'Digital Solutions Ltd.',
-      'position': 'UI/UX Designer',
-      'candidateName': 'Priya Sharma',
-      'appliedDate': 'Applied 1 day ago',
-      'status': 'rejected',
-      'phone': '+91 9876543213',
-      'whatsapp': '+91 9876543213',
-      'avatar': 'P',
-    },
-    {
-      'id': 5,
-      'company': 'StartUp Hub',
-      'position': 'Product Manager',
-      'candidateName': 'Rahul Kumar',
-      'appliedDate': 'Applied 3 days ago',
-      'status': 'pending',
-      'phone': '+91 9876543214',
-      'whatsapp': '+91 9876543214',
-      'avatar': 'R',
-    },
-  ];
+  // Use shared applications data
+  List<Map<String, dynamic>> get applications => globalApplications;
 
   // Filter options
   String selectedFilter = 'All';

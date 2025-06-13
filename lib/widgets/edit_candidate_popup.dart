@@ -50,7 +50,9 @@ class _EditCandidatePopupState extends State<EditCandidatePopup> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      elevation: 8,
+      backgroundColor: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: SingleChildScrollView(
@@ -58,56 +60,43 @@ class _EditCandidatePopupState extends State<EditCandidatePopup> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Edit Candidate',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: phoneController,
-                decoration: const InputDecoration(labelText: 'Phone'),
-                keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: roleController,
-                decoration: const InputDecoration(labelText: 'Role'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: locationController,
-                decoration: const InputDecoration(labelText: 'Location'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: qualificationController,
-                decoration: const InputDecoration(labelText: 'Qualification'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: experienceController,
-                decoration: const InputDecoration(labelText: 'Experience'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: ageController,
-                decoration: const InputDecoration(labelText: 'Age'),
-                keyboardType: TextInputType.number,
+              Row(
+                children: [
+                  const Icon(Icons.edit, color: Colors.blue, size: 28),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Edit Candidate',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
+              _styledTextField(nameController, 'Name', Icons.person),
+              const SizedBox(height: 14),
+              _styledTextField(phoneController, 'Phone', Icons.phone, keyboardType: TextInputType.phone),
+              const SizedBox(height: 14),
+              _styledTextField(roleController, 'Role', Icons.work),
+              const SizedBox(height: 14),
+              _styledTextField(locationController, 'Location', Icons.location_on),
+              const SizedBox(height: 14),
+              _styledTextField(qualificationController, 'Qualification', Icons.school),
+              const SizedBox(height: 14),
+              _styledTextField(experienceController, 'Experience', Icons.timeline),
+              const SizedBox(height: 14),
+              _styledTextField(ageController, 'Age', Icons.cake, keyboardType: TextInputType.number),
+              const SizedBox(height: 28),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.grey[700],
+                      textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     child: const Text('Cancel'),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 16),
                   ElevatedButton(
                     onPressed: () {
                       final updatedCandidate = Map<String, dynamic>.from(widget.candidate);
@@ -121,6 +110,14 @@ class _EditCandidatePopupState extends State<EditCandidatePopup> {
                       widget.onSave(updatedCandidate);
                       Navigator.pop(context);
                     },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 2,
+                    ),
                     child: const Text('Save'),
                   ),
                 ],
@@ -131,4 +128,23 @@ class _EditCandidatePopupState extends State<EditCandidatePopup> {
       ),
     );
   }
+
+  Widget _styledTextField(TextEditingController controller, String label, IconData icon, {TextInputType keyboardType = TextInputType.text}) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: Colors.blue),
+        filled: true,
+        fillColor: Colors.blue.withOpacity(0.06),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      ),
+    );
+  }
 }
+

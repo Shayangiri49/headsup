@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../services/database_service.dart';
 import '../models/company_model.dart';
+import '../../data/user_role.dart';
+import '../../data/companies_data.dart';
 
 class CandidatePopupForm extends StatefulWidget {
   final String initialPhone;
@@ -51,7 +53,7 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
   
   // Data from database
   List<String> localities = [];
-  List<Company> companies = [];
+  List<Company> get companies => globalCompanies;
   Company? selectedCompany;
   
   // Static options (these could also come from database)
@@ -109,18 +111,22 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
       final loadedCompanies = await databaseService.getCompanies();
       setState(() {
         localities = loadedLocalities;
-        companies = loadedCompanies;
+        globalCompanies
+          ..clear()
+          ..addAll(loadedCompanies);
       });
     } catch (e) {
       setState(() {
         localities = [
           'Marathahalli', 'MG Layout', 'Whitefield', 'Koramangala', 'Bellandur'
         ];
-        companies = [
-          Company(id: '1', name: 'Client 1', address: 'The Skyline • Seoul Plaza Rd'),
-          Company(id: '2', name: 'Client 2', address: 'Tech Park • Whitefield'),
-          Company(id: '3', name: 'Client 3', address: 'Business Hub • Koramangala'),
-        ];
+        globalCompanies
+          ..clear()
+          ..addAll([
+            Company(id: '1', name: 'Client 1', address: 'The Skyline • Seoul Plaza Rd'),
+            Company(id: '2', name: 'Client 2', address: 'Tech Park • Whitefield'),
+            Company(id: '3', name: 'Client 3', address: 'Business Hub • Koramangala'),
+          ]);
       });
     }
   }
@@ -221,7 +227,7 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
         return;
       }
       widget.onBookInterview({
-        'name': _firstNameController.text + (" ${_lastNameController.text}").trim(),
+        'name': (_firstNameController.text.trim() + ' ' + _lastNameController.text.trim()).trim(),
         'experience': _experienceController.text,
         'role': selectedJobCategory ?? '',
         'age': int.tryParse(_ageController.text) ?? 0,
@@ -232,6 +238,7 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
         'rating': 0.0,
         'notes': '',
         'phone': _mobileController.text,
+        'company': selectedCompany?.name ?? '',
       });
     }
   }
@@ -749,6 +756,73 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
                     const SizedBox(height: 24),
                     // Company Selection
                     _buildSectionTitle('Select Company'),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        if (currentUserRole == 'admin')
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.add, size: 16),
+                            label: const Text('Add Company'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryBlue,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              textStyle: const TextStyle(fontSize: 12),
+                            ),
+                            onPressed: () async {
+                              final nameController = TextEditingController();
+                              final addressController = TextEditingController();
+                              final result = await showDialog<Map<String, String>>(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text('Add Company'),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        TextField(
+                                          controller: nameController,
+                                          decoration: const InputDecoration(labelText: 'Company Name'),
+                                        ),
+                                        TextField(
+                                          controller: addressController,
+                                          decoration: const InputDecoration(labelText: 'Address'),
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          if (nameController.text.trim().isNotEmpty) {
+                                            Navigator.pop(context, {
+                                              'name': nameController.text.trim(),
+                                              'address': addressController.text.trim(),
+                                            });
+                                          }
+                                        },
+                                        child: const Text('Add'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                              if (result != null && result['name'] != null && result['name']!.isNotEmpty) {
+                                final newCompany = Company(
+                                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                                  name: result['name']!,
+                                  address: result['address'] ?? '',
+                                );
+                                globalCompanies.add(newCompany);
+                                setState(() {});
+                              }
+                            },
+                          ),
+                      ],
+                    ),
                     const SizedBox(height: 8),
                     companies.isEmpty 
                         ? const Center(
