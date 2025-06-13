@@ -227,7 +227,7 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
         return;
       }
       widget.onBookInterview({
-        'name': (_firstNameController.text.trim() + ' ' + _lastNameController.text.trim()).trim(),
+        'name': ('${_firstNameController.text.trim()} ${_lastNameController.text.trim()}').trim(),
         'experience': _experienceController.text,
         'role': selectedJobCategory ?? '',
         'age': int.tryParse(_ageController.text) ?? 0,

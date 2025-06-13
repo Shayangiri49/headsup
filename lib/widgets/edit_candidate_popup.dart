@@ -5,10 +5,10 @@ class EditCandidatePopup extends StatefulWidget {
   final void Function(Map<String, dynamic> updatedCandidate) onSave;
 
   const EditCandidatePopup({
-    Key? key,
+    super.key,
     required this.candidate,
     required this.onSave,
-  }) : super(key: key);
+  });
 
   @override
   State<EditCandidatePopup> createState() => _EditCandidatePopupState();

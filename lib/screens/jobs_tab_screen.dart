@@ -4,6 +4,46 @@ import '../models/job_model.dart';
 import '../../data/user_role.dart';
 import '../data/jobs_data.dart';
 
+// Helper widget for styled text fields in the dialog
+class _StyledTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final IconData icon;
+  final int maxLines;
+  final TextInputType? keyboardType;
+
+  const _StyledTextField({
+    Key? key,
+    required this.controller,
+    required this.label,
+    required this.icon,
+    this.maxLines = 1,
+    this.keyboardType,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: primaryBlue),
+        filled: true,
+        fillColor: lightGray,
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        labelStyle: const TextStyle(color: textSecondary, fontWeight: FontWeight.w500),
+      ),
+      style: const TextStyle(fontSize: 16, color: textDark),
+    );
+  }
+}
+
 class JobsTabScreen extends StatefulWidget {
   final VoidCallback onBackToHome;
   const JobsTabScreen({super.key, required this.onBackToHome});
@@ -134,95 +174,177 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
                 ),
                 // Post Job (admin only)
                 if (currentUserRole == 'admin')
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.add),
-                        label: const Text('Post Job'),
-                        style: ElevatedButton.styleFrom(
+                Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                icon: const Icon(Icons.add),
+                label: const Text('Post Job'),
+                style: ElevatedButton.styleFrom(
+                backgroundColor: primaryBlue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                onPressed: () async {
+                final titleController = TextEditingController();
+                final companyController = TextEditingController();
+                final locationController = TextEditingController();
+                final salaryController = TextEditingController();
+                String type = 'Full-Time';
+                final descriptionController = TextEditingController();
+                final aboutController = TextEditingController();
+                          final result = await showDialog<Map<String, String>>(
+                          context: context,
+                          builder: (context) {
+                          return Dialog(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          backgroundColor: backgroundWhite,
+                          child: SingleChildScrollView(
+                          child: Padding(
+                          padding: const EdgeInsets.all(0),
+                          child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                          // Header
+                          Container(
+                          decoration: BoxDecoration(
+                          color: primaryBlue,
+                          borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                          ),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                          child: Row(
+                          children: const [
+                          Icon(Icons.work, color: Colors.white, size: 28),
+                          SizedBox(width: 12),
+                          Text(
+                          'Post a Job',
+                          style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          ),
+                          ),
+                          ],
+                          ),
+                          ),
+                          Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                          _StyledTextField(
+                          controller: titleController,
+                          label: 'Job Title',
+                          icon: Icons.title,
+                          ),
+                          const SizedBox(height: 14),
+                          _StyledTextField(
+                          controller: companyController,
+                          label: 'Company',
+                          icon: Icons.business,
+                          ),
+                          const SizedBox(height: 14),
+                          _StyledTextField(
+                          controller: locationController,
+                          label: 'Location',
+                          icon: Icons.location_on,
+                          ),
+                          const SizedBox(height: 14),
+                          _StyledTextField(
+                          controller: salaryController,
+                          label: 'Salary',
+                          icon: Icons.attach_money,
+                          keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 14),
+                          Container(
+                          decoration: BoxDecoration(
+                          color: lightGray,
+                          borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: DropdownButtonFormField<String>(
+                          value: type,
+                          items: [
+                          'Full-Time', 'Remote', 'Hybrid', 'Part-Time', 'Internship'
+                          ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                          onChanged: (val) => type = val ?? 'Full-Time',
+                          decoration: const InputDecoration(
+                          labelText: 'Type',
+                          border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(12))),
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                          ),
+                          style: const TextStyle(fontSize: 16, color: textDark),
+                          ),
+                          ),
+                          const SizedBox(height: 14),
+                          _StyledTextField(
+                          controller: descriptionController,
+                          label: 'Description',
+                          icon: Icons.description,
+                          maxLines: 2,
+                          ),
+                          const SizedBox(height: 14),
+                          _StyledTextField(
+                          controller: aboutController,
+                          label: 'About Company',
+                          icon: Icons.info_outline,
+                          maxLines: 2,
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                          TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: TextButton.styleFrom(
+                          foregroundColor: textSecondary,
+                          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          child: const Text('Cancel'),
+                          ),
+                          const SizedBox(width: 12),
+                          ElevatedButton(
+                          onPressed: () {
+                          if (titleController.text.trim().isNotEmpty && companyController.text.trim().isNotEmpty) {
+                          Navigator.pop(context, {
+                          'title': titleController.text.trim(),
+                          'company': companyController.text.trim(),
+                          'location': locationController.text.trim(),
+                          'salary': salaryController.text.trim(),
+                          'type': type,
+                          'description': descriptionController.text.trim(),
+                          'about': aboutController.text.trim(),
+                          });
+                          }
+                          },
+                          style: ElevatedButton.styleFrom(
                           backgroundColor: primaryBlue,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        onPressed: () async {
-                          final titleController = TextEditingController();
-                          final companyController = TextEditingController();
-                          final locationController = TextEditingController();
-                          final salaryController = TextEditingController();
-                          String type = 'Full-Time';
-                          final descriptionController = TextEditingController();
-                          final aboutController = TextEditingController();
-                          final result = await showDialog<Map<String, String>>(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text('Post Job'),
-                                content: SingleChildScrollView(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextField(
-                                        controller: titleController,
-                                        decoration: const InputDecoration(labelText: 'Job Title'),
-                                      ),
-                                      TextField(
-                                        controller: companyController,
-                                        decoration: const InputDecoration(labelText: 'Company'),
-                                      ),
-                                      TextField(
-                                        controller: locationController,
-                                        decoration: const InputDecoration(labelText: 'Location'),
-                                      ),
-                                      TextField(
-                                        controller: salaryController,
-                                        decoration: const InputDecoration(labelText: 'Salary'),
-                                      ),
-                                      DropdownButtonFormField<String>(
-                                        value: type,
-                                        items: [
-                                          'Full-Time', 'Remote', 'Hybrid', 'Part-Time', 'Internship'
-                                        ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                                        onChanged: (val) => type = val ?? 'Full-Time',
-                                        decoration: const InputDecoration(labelText: 'Type'),
-                                      ),
-                                      TextField(
-                                        controller: descriptionController,
-                                        decoration: const InputDecoration(labelText: 'Description'),
-                                      ),
-                                      TextField(
-                                        controller: aboutController,
-                                        decoration: const InputDecoration(labelText: 'About Company'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      if (titleController.text.trim().isNotEmpty && companyController.text.trim().isNotEmpty) {
-                                        Navigator.pop(context, {
-                                          'title': titleController.text.trim(),
-                                          'company': companyController.text.trim(),
-                                          'location': locationController.text.trim(),
-                                          'salary': salaryController.text.trim(),
-                                          'type': type,
-                                          'description': descriptionController.text.trim(),
-                                          'about': aboutController.text.trim(),
-                                        });
-                                      }
-                                    },
-                                    child: const Text('Post'),
-                                  ),
-                                ],
-                              );
-                            },
+                          ),
+                          child: const Text('Post'),
+                          ),
+                          ],
+                          ),
+                          ],
+                          ),
+                          ),
+                          ],
+                          ),
+                          ),
+                          ),
+                          );
+                          },
                           );
                           if (result != null && result['title'] != null && result['company'] != null) {
                             setState(() {
