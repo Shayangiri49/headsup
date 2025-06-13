@@ -1,0 +1,589 @@
+import 'package:flutter/material.dart';
+import '../utils/app_colors.dart';
+import '../services/notification_service.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class ApplicationsTabScreen extends StatefulWidget {
+  const ApplicationsTabScreen({super.key});
+
+  @override
+  State<ApplicationsTabScreen> createState() => _ApplicationsTabScreenState();
+}
+
+class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
+  final NotificationService _notificationService = NotificationService();
+  
+  // Sample applications data
+  List<Map<String, dynamic>> applications = [
+    {
+      'id': 1,
+      'company': 'Tech Innovators Inc.',
+      'position': 'Senior Software Engineer',
+      'candidateName': 'Tanvi Mandal',
+      'appliedDate': 'Applied 2 days ago',
+      'status': 'pending', // pending, selected, rejected, joined
+      'phone': '+91 9876543210',
+      'whatsapp': '+91 9876543210',
+      'avatar': 'T',
+    },
+    {
+      'id': 2,
+      'company': 'Tech Innovators Inc.',
+      'position': 'Senior Software Engineer',
+      'candidateName': 'Tanvi Mandal',
+      'appliedDate': 'Applied 2 days ago',
+      'status': 'selected',
+      'phone': '+91 9876543211',
+      'whatsapp': '+91 9876543211',
+      'avatar': 'T',
+    },
+    {
+      'id': 3,
+      'company': 'Tech Innovators Inc.',
+      'position': 'Senior Software Engineer',
+      'candidateName': 'Tanvi Mandal',
+      'appliedDate': 'Applied 2 days ago',
+      'status': 'joined',
+      'phone': '+91 9876543212',
+      'whatsapp': '+91 9876543212',
+      'avatar': 'T',
+    },
+    {
+      'id': 4,
+      'company': 'Digital Solutions Ltd.',
+      'position': 'UI/UX Designer',
+      'candidateName': 'Priya Sharma',
+      'appliedDate': 'Applied 1 day ago',
+      'status': 'rejected',
+      'phone': '+91 9876543213',
+      'whatsapp': '+91 9876543213',
+      'avatar': 'P',
+    },
+    {
+      'id': 5,
+      'company': 'StartUp Hub',
+      'position': 'Product Manager',
+      'candidateName': 'Rahul Kumar',
+      'appliedDate': 'Applied 3 days ago',
+      'status': 'pending',
+      'phone': '+91 9876543214',
+      'whatsapp': '+91 9876543214',
+      'avatar': 'R',
+    },
+  ];
+
+  // Filter options
+  String selectedFilter = 'All';
+  List<String> filterOptions = ['All', 'Selected', 'Rejected', 'Joined', 'Pending'];
+
+  List<Map<String, dynamic>> get filteredApplications {
+    if (selectedFilter == 'All') {
+      return applications;
+    }
+    return applications.where((app) {
+      switch (selectedFilter.toLowerCase()) {
+        case 'selected':
+          return app['status'] == 'selected';
+        case 'rejected':
+          return app['status'] == 'rejected';
+        case 'joined':
+          return app['status'] == 'joined';
+        case 'pending':
+          return app['status'] == 'pending';
+        default:
+          return true;
+      }
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: lightGray,
+      appBar: AppBar(
+        title: const Text('Application'),
+        backgroundColor: backgroundWhite,
+        elevation: 1,
+        titleTextStyle: const TextStyle(
+          color: textDark,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+        actions: [
+          // Filter dropdown
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.filter_list, color: textDark),
+            onSelected: (String value) {
+              setState(() {
+                selectedFilter = value;
+              });
+            },
+            itemBuilder: (BuildContext context) => filterOptions.map((String choice) {
+              return PopupMenuItem<String>(
+                value: choice,
+                child: Row(
+                  children: [
+                    if (selectedFilter == choice)
+                      const Icon(Icons.check, color: primaryBlue, size: 20),
+                    if (selectedFilter == choice) const SizedBox(width: 8),
+                    Text(choice),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Filter status bar
+          if (selectedFilter != 'All')
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              color: primaryBlue.withOpacity(0.1),
+              child: Row(
+                children: [
+                  Icon(Icons.filter_alt, color: primaryBlue, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Showing $selectedFilter applications (${filteredApplications.length})',
+                    style: const TextStyle(
+                      color: primaryBlue,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedFilter = 'All';
+                      });
+                    },
+                    child: const Text(
+                      'Clear',
+                      style: TextStyle(
+                        color: primaryBlue,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          
+          // Applications list
+          Expanded(
+            child: filteredApplications.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.article_outlined,
+                          size: 80,
+                          color: textSecondary.withOpacity(0.5),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          selectedFilter == 'All' 
+                              ? 'No applications yet'
+                              : 'No $selectedFilter applications',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Applications will appear here when candidates apply',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: filteredApplications.length,
+                    itemBuilder: (context, index) {
+                      return _buildApplicationCard(filteredApplications[index], index);
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildApplicationCard(Map<String, dynamic> application, int index) {
+    Color getStatusColor(String status) {
+      switch (status) {
+        case 'selected':
+          return Colors.blue;
+        case 'rejected':
+          return Colors.red;
+        case 'joined':
+          return Colors.green;
+        default:
+          return Colors.orange;
+      }
+    }
+
+    String getStatusText(String status) {
+      switch (status) {
+        case 'selected':
+          return 'Selected';
+        case 'rejected':
+          return 'Rejected';
+        case 'joined':
+          return 'Joined';
+        default:
+          return 'Pending';
+      }
+    }
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: getStatusColor(application['status']).withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            // Header with company info and avatar
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        application['company'],
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: textDark,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        application['position'],
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        application['candidateName'],
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: textDark,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        application['appliedDate'],
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Avatar
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0E68C), // Light yellow background
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Text(
+                      application['avatar'],
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: textDark,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Status badge
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: getStatusColor(application['status']).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: getStatusColor(application['status']),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    getStatusText(application['status']),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: getStatusColor(application['status']),
+                    ),
+                  ),
+                ),
+                const Spacer(),
+              ],
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Action buttons
+            Row(
+              children: [
+                // WhatsApp button
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _openWhatsApp(application['whatsapp']),
+                    icon: const Icon(Icons.chat, size: 18),
+                    label: const Text(''),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF25D366), // WhatsApp green
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                
+                // Phone button
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _makePhoneCall(application['phone']),
+                    icon: const Icon(Icons.phone, size: 18),
+                    label: const Text(''),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2196F3), // Blue
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                
+                // More options (3-dot menu)
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: textSecondary),
+                    onSelected: (String value) {
+                      _handleStatusChange(application, value, index);
+                    },
+                    itemBuilder: (BuildContext context) => [
+                      PopupMenuItem<String>(
+                        value: 'selected',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle_outline,
+                              color: Colors.blue,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('Selected'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'rejected',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.cancel_outlined,
+                              color: Colors.red,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('Rejected'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'joined',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.person_add_outlined,
+                              color: Colors.green,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('Joined'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // WhatsApp functionality
+  void _openWhatsApp(String phoneNumber) async {
+    // Remove any special characters and spaces
+    final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+    final whatsappUrl = "https://wa.me/$cleanNumber";
+    
+    try {
+      final uri = Uri.parse(whatsappUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('WhatsApp is not installed on this device'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to open WhatsApp'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  // Phone call functionality
+  void _makePhoneCall(String phoneNumber) async {
+    final phoneUrl = "tel:$phoneNumber";
+    
+    try {
+      final uri = Uri.parse(phoneUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Unable to make phone call'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to make phone call'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  // Handle status change from dropdown
+  void _handleStatusChange(Map<String, dynamic> application, String newStatus, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Update Application Status'),
+          content: Text(
+            'Are you sure you want to mark ${application['candidateName']} as $newStatus?'
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  // Find the application in the main list and update it
+                  final originalIndex = applications.indexWhere((app) => app['id'] == application['id']);
+                  if (originalIndex != -1) {
+                    applications[originalIndex]['status'] = newStatus;
+                  }
+                });
+                
+                // Add notification
+                _notificationService.addNotification(
+                  title: 'Application Status Updated',
+                  message: '${application['candidateName']} has been marked as $newStatus',
+                  type: NotificationType.general,
+                  candidateName: application['candidateName'],
+                );
+                
+                // Show success message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('${application['candidateName']} marked as $newStatus'),
+                    backgroundColor: _getStatusColor(newStatus),
+                  ),
+                );
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'selected':
+        return Colors.blue;
+      case 'rejected':
+        return Colors.red;
+      case 'joined':
+        return Colors.green;
+      default:
+        return Colors.orange;
+    }
+  }
+}
