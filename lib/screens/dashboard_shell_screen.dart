@@ -55,12 +55,9 @@ class _DashboardShellScreenState extends State<DashboardShellScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: primaryBlue,
-        unselectedItemColor: textSecondary,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         onTap: _onItemTapped,
-        backgroundColor: backgroundWhite,
         elevation: 8.0,
       ),
     );

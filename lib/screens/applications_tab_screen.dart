@@ -53,24 +53,19 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
       return false;
       },
       child: Scaffold(
-      backgroundColor: lightGray,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
       leading: IconButton(
-      icon: const Icon(Icons.arrow_back),
+      icon: Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
       onPressed: widget.onBackToHome,
       ),
-      title: const Text('Application'),
-      backgroundColor: backgroundWhite,
+      title: Text('Application', style: Theme.of(context).appBarTheme.titleTextStyle),
+      backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       elevation: 1,
-      titleTextStyle: const TextStyle(
-      color: textDark,
-      fontSize: 20,
-      fontWeight: FontWeight.bold,
-      ),
       actions: [
       // Filter dropdown
       PopupMenuButton<String>(
-      icon: const Icon(Icons.filter_list, color: textDark),
+      icon: Icon(Icons.filter_list, color: Theme.of(context).iconTheme.color),
       onSelected: (String value) {
       setState(() {
       selectedFilter = value;
@@ -82,7 +77,7 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
       child: Row(
       children: [
       if (selectedFilter == choice)
-      const Icon(Icons.check, color: primaryBlue, size: 20),
+      Icon(Icons.check, color: Theme.of(context).colorScheme.primary, size: 20),
       if (selectedFilter == choice) const SizedBox(width: 8),
       Text(choice),
       ],
@@ -99,15 +94,15 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
           Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
-          color: primaryBlue.withOpacity(0.1),
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
           child: Row(
             children: [
-            Icon(Icons.filter_alt, color: primaryBlue, size: 20),
+            Icon(Icons.filter_alt, color: Theme.of(context).colorScheme.primary, size: 20),
             const SizedBox(width: 8),
             Text(
               'Showing $selectedFilter applications (${filteredApplications.length})',
-              style: const TextStyle(
-              color: primaryBlue,
+              style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.w500,
               ),
             ),
@@ -118,13 +113,13 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                 selectedFilter = 'All';
               });
               },
-              child: const Text(
-              'Clear',
-              style: TextStyle(
-                color: primaryBlue,
-                fontWeight: FontWeight.w500,
-                decoration: TextDecoration.underline,
-              ),
+              child: Text(
+                'Clear',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
             ],
@@ -141,26 +136,23 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                 Icon(
                 Icons.article_outlined,
                 size: 80,
-                color: textSecondary.withOpacity(0.5),
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5),
                 ),
                 const SizedBox(height: 16),
                 Text(
                 selectedFilter == 'All' 
                   ? 'No applications yet'
                   : 'No $selectedFilter applications',
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
-                  color: textSecondary,
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
                 ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                 'Applications will appear here when candidates apply',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: textSecondary,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14),
                 textAlign: TextAlign.center,
                 ),
               ],
@@ -214,6 +206,7 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: getStatusColor(application['status']).withOpacity(0.2),
@@ -231,36 +224,22 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                     children: [
                       Text(
                         application['company'],
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: textDark,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         application['position'],
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: textSecondary,
-                        ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         application['candidateName'],
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: textDark,
-                        ),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         application['appliedDate'],
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: textSecondary,
-                        ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12),
                       ),
                     ],
                   ),
@@ -276,11 +255,7 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                   child: Center(
                     child: Text(
                       application['avatar'],
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: textDark,
-                      ),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -364,7 +339,7 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert, color: textSecondary),
+                      icon: Icon(Icons.more_vert, color: Theme.of(context).iconTheme.color),
                       onSelected: (String value) {
                         _handleStatusChange(application, value, index);
                       },

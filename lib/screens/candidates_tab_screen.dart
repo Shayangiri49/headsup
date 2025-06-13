@@ -89,9 +89,11 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
+          backgroundColor: Theme.of(context).cardColor,
           child: Container(
             width: MediaQuery.of(context).size.width * 0.9,
             padding: const EdgeInsets.all(24),
+            color: Theme.of(context).cardColor,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -104,19 +106,12 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                         children: [
                           Text(
                             candidate['name'],
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: textDark,
-                            ),
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 24, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Text(
                             candidate['role'],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: textSecondary,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 16),
                           ),
                         ],
                       ),
@@ -156,11 +151,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                       children: [
                         Text(
                           candidate['rating'].toString(),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: textDark,
-                          ),
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(width: 8),
                         Row(
@@ -215,9 +206,9 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'View Resume',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12, fontWeight: FontWeight.w500),
                       ),
                     ),
                   ],
@@ -269,12 +260,8 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Notes',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: textDark,
-                    ),
+                  'Notes',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -298,11 +285,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                               border: InputBorder.none,
                               hintText: 'Write notes here...',
                             ),
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: textSecondary,
-                              height: 1.4,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14, height: 1.4),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -329,7 +312,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Text('Save Notes'),
+                            child: Text('Save Notes', style: Theme.of(context).textTheme.bodyLarge),
                           ),
                         ),
                       ],
@@ -414,12 +397,9 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Close',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: primaryBlue,
-                      ),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, color: Theme.of(context).colorScheme.primary),
                     ),
                   ),
                 ),
@@ -437,20 +417,12 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: textSecondary,
-            fontWeight: FontWeight.w500,
-          ),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 16,
-            color: textDark,
-            fontWeight: FontWeight.w500,
-          ),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w500),
         ),
       ],
     );
@@ -775,46 +747,41 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
       return false;
       },
       child: Scaffold(
-      backgroundColor: lightGray,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
           onPressed: widget.onBackToHome,
         ),
         title: _isSearching
           ? null
           : Row(
             children: [
-            const Text('Candidates List'),
-            const SizedBox(width: 8),
+            Text('Candidates List', style: Theme.of(context).appBarTheme.titleTextStyle),
+            SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-              color: primaryBlue.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
               '${filteredCandidates.length}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: primaryBlue,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
               ),
               ),
             ),
             ],
           ),
-        backgroundColor: backgroundWhite,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 1,
-        titleTextStyle: const TextStyle(
-        color: textDark,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        ),
         actions: [
         if (!_isSearching) ...[
           IconButton(
-          icon: const Icon(Icons.search, color: textDark),
+          icon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
           onPressed: () {
             setState(() {
             _isSearching = true;
@@ -822,12 +789,12 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
           },
           ),
           IconButton(
-          icon: const Icon(Icons.filter_list, color: textDark),
+          icon: Icon(Icons.filter_list, color: Theme.of(context).iconTheme.color),
           onPressed: () => _showFilterDialog(context),
           ),
         ] else ...[
           IconButton(
-          icon: const Icon(Icons.close, color: textDark),
+          icon: Icon(Icons.close, color: Theme.of(context).iconTheme.color),
           onPressed: _clearSearch,
           ),
         ],
@@ -842,15 +809,15 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
               autofocus: true,
               decoration: InputDecoration(
               hintText: 'Search by name, role, location, qualification...',
-              prefixIcon: const Icon(Icons.search, color: textSecondary),
+              prefixIcon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
               suffixIcon: _searchQuery.isNotEmpty
                 ? IconButton(
-                  icon: const Icon(Icons.clear, color: textSecondary),
+                  icon: Icon(Icons.clear, color: Theme.of(context).iconTheme.color),
                   onPressed: _clearSearch,
                   )
                 : null,
               filled: true,
-              fillColor: backgroundWhite,
+              fillColor: Theme.of(context).cardColor,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -898,13 +865,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
           ),
           ],
 
-          // Quick actions header (only when not searching)
-          if (!_isSearching)
-          const SliverPersistentHeader(
-            pinned: false,
-            floating: true,
-            delegate: _QuickActionsHeaderDelegate(),
-          ),
+          // Quick actions header removed
 
           // Candidates list
           if (filteredCandidates.isEmpty && _isSearching) ...[
@@ -995,57 +956,52 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
     Widget buildHighlightedText(String text, String query) {
       if (query.isEmpty) {
         return GestureDetector(
-          onTap: () => _showCandidateDetails(candidate, index), // Make name clickable
+          onTap: () => _showCandidateDetails(candidate, index),
           child: Text(
             text,
-            style: const TextStyle(
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: primaryBlue, // Make it look clickable
-              decoration: TextDecoration.underline,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         );
       }
-
       final lowerText = text.toLowerCase();
       final lowerQuery = query.toLowerCase();
-      
       if (!lowerText.contains(lowerQuery)) {
         return GestureDetector(
           onTap: () => _showCandidateDetails(candidate, index),
           child: Text(
             text,
-            style: const TextStyle(
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: primaryBlue,
+              color: Theme.of(context).colorScheme.primary,
               decoration: TextDecoration.underline,
             ),
           ),
         );
       }
-
       final startIndex = lowerText.indexOf(lowerQuery);
       final endIndex = startIndex + query.length;
-
       return GestureDetector(
         onTap: () => _showCandidateDetails(candidate, index),
         child: RichText(
           text: TextSpan(
-            style: const TextStyle(
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: primaryBlue,
+              color: Theme.of(context).colorScheme.primary,
               decoration: TextDecoration.underline,
             ),
             children: [
               TextSpan(text: text.substring(0, startIndex)),
               TextSpan(
                 text: text.substring(startIndex, endIndex),
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   backgroundColor: Colors.yellow,
-                  color: textDark,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
               TextSpan(text: text.substring(endIndex)),
@@ -1054,11 +1010,11 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
         ),
       );
     }
-
     return Card(
       margin: const EdgeInsets.only(bottom: 20.0),
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Theme.of(context).cardColor,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -1072,7 +1028,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       buildHighlightedText(candidate['name'], _searchQuery),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       Row(
                         children: [
                           Container(
@@ -1084,33 +1040,33 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                             ),
                             child: Text(
                               candidate['experience'],
-                              style: const TextStyle(
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 fontSize: 12,
                                 color: Colors.green,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10),
                           Flexible(
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: primaryBlue.withOpacity(0.1),
+                                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: primaryBlue, width: 1),
+                                border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
                               ),
                               child: Text(
                                 candidate['role'],
-                                style: const TextStyle(
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   fontSize: 12,
-                                  color: primaryBlue,
+                                  color: Theme.of(context).colorScheme.primary,
                                   fontWeight: FontWeight.w500,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                                                      ),
+                          ),
                         ],
                       ),
                     ],
@@ -1118,22 +1074,20 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                 ),
                 // Edit button (always visible)
                 IconButton(
-                onPressed: () => _editCandidate(index),
-                icon: const Icon(Icons.edit_outlined, color: textSecondary),
-                tooltip: 'Edit Candidate',
+                  onPressed: () => _editCandidate(index),
+                  icon: Icon(Icons.edit_outlined, color: Theme.of(context).iconTheme.color),
+                  tooltip: 'Edit Candidate',
                 ),
                 // Delete button (admin only)
                 if (currentUserRole == 'admin')
-                IconButton(
-                onPressed: () => _removeCandidate(index),
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                tooltip: 'Delete Candidate',
-                ),
+                  IconButton(
+                    onPressed: () => _removeCandidate(index),
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    tooltip: 'Delete Candidate',
+                  ),
               ],
             ),
-            
-            const SizedBox(height: 16),
-            
+            SizedBox(height: 16),
             // Candidate details
             Row(
               children: [
@@ -1142,9 +1096,9 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildDetailRow(Icons.location_on_outlined, candidate['location']),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       _buildDetailRow(Icons.school_outlined, candidate['qualification']),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       _buildDetailRow(Icons.calendar_today_outlined, 'Added: ${candidate['addedDate']}'),
                     ],
                   ),
@@ -1154,33 +1108,27 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.star, color: Colors.amber, size: 20),
-                        const SizedBox(width: 4),
+                        Icon(Icons.star, color: Colors.amber, size: 20),
+                        SizedBox(width: 4),
                         Text(
                           candidate['rating'].toString(),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: textDark,
-                          ),
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       'Rating',
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 12,
-                        color: textSecondary.withOpacity(0.7),
+                        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                       ),
                     ),
                   ],
                 ),
               ],
             ),
-            
-            const SizedBox(height: 20),
-            
+            SizedBox(height: 20),
             // Action buttons
             Row(
               children: [
@@ -1371,38 +1319,4 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
   }
 }
 
-// QuickActionsHeaderDelegate class for the persistent header
-class _QuickActionsHeaderDelegate extends SliverPersistentHeaderDelegate {
-  const _QuickActionsHeaderDelegate();
-
-  @override
-  double get minExtent => 60.0;
-
-  @override
-  double get maxExtent => 60.0;
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: backgroundWhite,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: const Row(
-        children: [
-          Text(
-            'Quick Actions',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: textDark,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    return true;
-  }
-}
+// QuickActionsHeaderDelegate removed

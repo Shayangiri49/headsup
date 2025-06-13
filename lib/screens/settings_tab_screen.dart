@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart'; // For specific colors if not themed
 import 'login_screen.dart'; // For logout navigation
+import 'privacy_policy_screen.dart';
+import 'help_support_screen.dart';
+import 'account_details_screen.dart';
 
 class SettingsTabScreen extends StatefulWidget {
   const SettingsTabScreen({super.key});
@@ -19,10 +22,11 @@ class _SettingsTabScreenState extends State<SettingsTabScreen> {
         title: const Text('Settings'),
       ),
       // backgroundColor: lightGreyBackground, // From theme
-      body: ListView(
-        children: <Widget>[
-          const SizedBox(height: 20),
-          // User Profile Summary Area
+      body: Builder(
+        builder: (context) => ListView(
+          children: <Widget>[
+            const SizedBox(height: 20),
+            // User Profile Summary Area
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
@@ -57,19 +61,13 @@ class _SettingsTabScreenState extends State<SettingsTabScreen> {
             icon: Icons.account_circle_outlined,
             title: 'Account Details',
             onTap: () {
-              // TODO: Navigate to Edit Profile Screen
-              print('Account Details tapped');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AccountDetailsScreen()),
+              );
             },
           ),
-          _buildSettingsItem(
-            context,
-            icon: Icons.notifications_outlined,
-            title: 'Notification Preferences',
-            onTap: () {
-              // TODO: Navigate to Notification Settings Screen or expand
-              print('Notification Preferences tapped');
-            },
-          ),
+          // Notification Preferences removed
           ListTile(
             leading: const Icon(Icons.dark_mode_outlined, color: primaryDarkBlue),
             title: const Text('Dark Mode'),
@@ -113,8 +111,10 @@ class _SettingsTabScreenState extends State<SettingsTabScreen> {
             icon: Icons.privacy_tip_outlined,
             title: 'Privacy Policy',
             onTap: () {
-              // TODO: Navigate to Privacy Policy Screen/Webview
-              print('Privacy Policy tapped');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PrivacyPolicyScreen()),
+              );
             },
           ),
           _buildSettingsItem(
@@ -122,8 +122,10 @@ class _SettingsTabScreenState extends State<SettingsTabScreen> {
             icon: Icons.help_outline,
             title: 'Help & Support',
             onTap: () {
-              // TODO: Navigate to Help/FAQ Screen
-              print('Help & Support tapped');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HelpSupportScreen()),
+              );
             },
           ),
           const Divider(height: 40),
@@ -145,9 +147,10 @@ class _SettingsTabScreenState extends State<SettingsTabScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
+        ),
+        ),
+        );
+        }
 
   Widget _buildSettingsItem(BuildContext context, {required IconData icon, required String title, required VoidCallback onTap}) {
     return ListTile(

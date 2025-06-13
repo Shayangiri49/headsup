@@ -39,7 +39,7 @@ class _StyledTextField extends StatelessWidget {
         ),
         labelStyle: const TextStyle(color: textSecondary, fontWeight: FontWeight.w500),
       ),
-      style: const TextStyle(fontSize: 16, color: textDark),
+      style: TextStyle(fontSize: 16, color: Theme.of(context).textTheme.bodyLarge?.color),
     );
   }
 }
@@ -81,25 +81,20 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
         return false;
       },
       child: Scaffold(
-        backgroundColor: lightGray,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
             onPressed: widget.onBackToHome,
           ),
-          title: const Text('Jobs'),
-          backgroundColor: backgroundWhite,
+          title: Text('Jobs', style: Theme.of(context).appBarTheme.titleTextStyle),
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           elevation: 1,
-          titleTextStyle: const TextStyle(
-            color: textDark,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
           actions: [
             Stack(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.filter_list, color: textDark),
+                  icon: Icon(Icons.filter_list, color: Theme.of(context).iconTheme.color),
                   onPressed: () {
                     setState(() {
                       showFilterMenu = !showFilterMenu;
@@ -119,19 +114,15 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
                   duration: const Duration(milliseconds: 300),
                   height: showFilterMenu ? 120 : 0,
                   child: Container(
-                    color: backgroundWhite,
+                    color: Theme.of(context).cardColor,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(
-                          padding: EdgeInsets.all(16.0),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
                           child: Text(
                             'Filter Menu...',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: textSecondary,
-                            ),
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                         ),
                         Container(
@@ -154,14 +145,14 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
                                       showFilterMenu = false;
                                     });
                                   },
-                                  backgroundColor: backgroundWhite,
-                                  selectedColor: primaryBlue.withOpacity(0.2),
+                                  backgroundColor: Theme.of(context).cardColor,
+                                  selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                                   labelStyle: TextStyle(
-                                    color: isSelected ? primaryBlue : textSecondary,
+                                    color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).textTheme.bodyMedium?.color,
                                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                                   ),
                                   side: BorderSide(
-                                    color: isSelected ? primaryBlue : borderColor,
+                                    color: isSelected ? Theme.of(context).colorScheme.primary : borderColor,
                                   ),
                                 ),
                               );
@@ -182,8 +173,8 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
                 icon: const Icon(Icons.add),
                 label: const Text('Post Job'),
                 style: ElevatedButton.styleFrom(
-                backgroundColor: primaryBlue,
-                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
@@ -200,7 +191,7 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
                           builder: (context) {
                           return Dialog(
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          backgroundColor: backgroundWhite,
+                          backgroundColor: Theme.of(context).cardColor,
                           child: SingleChildScrollView(
                           child: Padding(
                           padding: const EdgeInsets.all(0),
@@ -305,7 +296,7 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
                           TextButton(
                           onPressed: () => Navigator.pop(context),
                           style: TextButton.styleFrom(
-                          foregroundColor: textSecondary,
+                          foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
                           textStyle: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           child: const Text('Cancel'),
@@ -326,8 +317,8 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
                           }
                           },
                           style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryBlue,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -425,7 +416,7 @@ class JobCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: cardBackground,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -448,19 +439,12 @@ class JobCard extends StatelessWidget {
                     children: [
                       Text(
                         job.title,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: textDark,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         job.company,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: textSecondary,
-                        ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14),
                       ),
                     ],
                   ),
@@ -474,7 +458,7 @@ class JobCard extends StatelessWidget {
                   child: Text(
                     job.type,
                     style: const TextStyle(
-                      color: backgroundWhite,
+                      color: Colors.white,
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
@@ -485,24 +469,18 @@ class JobCard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.location_on, size: 16, color: textSecondary),
+                Icon(Icons.location_on, size: 16, color: Theme.of(context).textTheme.bodyMedium?.color),
                 const SizedBox(width: 4),
                 Text(
                   job.location,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: textSecondary,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14),
                 ),
                 const SizedBox(width: 16),
-                const Icon(Icons.attach_money, size: 16, color: textSecondary),
+                Icon(Icons.attach_money, size: 16, color: Theme.of(context).textTheme.bodyMedium?.color),
                 const SizedBox(width: 4),
                 Text(
                   job.salary,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: textSecondary,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14),
                 ),
               ],
             ),
@@ -512,8 +490,8 @@ class JobCard extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onFullDetailsPressed,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
-                  foregroundColor: buttonTextWhite,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -550,7 +528,7 @@ class JobDetailsPanel extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(top: 8),
       decoration: BoxDecoration(
-        color: backgroundWhite,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -570,7 +548,7 @@ class JobDetailsPanel extends StatelessWidget {
               children: [
                 IconButton(
                   onPressed: onClose,
-                  icon: const Icon(Icons.arrow_back, color: textDark),
+                  icon: Icon(Icons.arrow_back, color: Theme.of(context).iconTheme.color),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -579,19 +557,11 @@ class JobDetailsPanel extends StatelessWidget {
                     children: [
                       Text(
                         job.company,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: textDark,
-                        ),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         job.title,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: textDark,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
@@ -607,13 +577,13 @@ class JobDetailsPanel extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: primaryBlue.withOpacity(0.1),
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     job.salary,
-                    style: const TextStyle(
-                      color: primaryBlue,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -645,13 +615,9 @@ class JobDetailsPanel extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                const Text(
+                Text(
                   'Description',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: textDark,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -660,11 +626,7 @@ class JobDetailsPanel extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
               job.description,
-              style: const TextStyle(
-                fontSize: 14,
-                color: textSecondary,
-                height: 1.5,
-              ),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14, height: 1.5),
             ),
           ),
           // About the job
@@ -673,31 +635,19 @@ class JobDetailsPanel extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'About the job',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: textDark,
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   job.description,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: textSecondary,
-                    height: 1.5,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14, height: 1.5),
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'Responsibilities',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: textDark,
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 ...job.responsibilities.map((responsibility) {
@@ -706,15 +656,11 @@ class JobDetailsPanel extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('• ', style: TextStyle(color: textSecondary)),
+                        Text('• ', style: Theme.of(context).textTheme.bodyMedium),
                         Expanded(
                           child: Text(
                             responsibility,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: textSecondary,
-                              height: 1.5,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14, height: 1.5),
                           ),
                         ),
                       ],
@@ -722,22 +668,14 @@ class JobDetailsPanel extends StatelessWidget {
                   );
                 }),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'About the Company',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: textDark,
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   job.aboutCompany,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: textSecondary,
-                    height: 1.5,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14, height: 1.5),
                 ),
                 const SizedBox(height: 16),
               ],

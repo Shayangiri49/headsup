@@ -44,7 +44,46 @@ void main() {
               elevation: 8.0,
             ),
           ),
-          darkTheme: ThemeData.dark(),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            primaryColor: primaryBlue,
+            scaffoldBackgroundColor: Color(0xFF181A20),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Color(0xFF23262B),
+              elevation: 1,
+              iconTheme: IconThemeData(color: Colors.white),
+              titleTextStyle: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryBlue,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              selectedItemColor: Color(0xFF4A90E2),
+              unselectedItemColor: Colors.white70,
+              showUnselectedLabels: true,
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: Color(0xFF23262B),
+              elevation: 8.0,
+            ),
+            cardColor: Color(0xFF23262B),
+            dialogBackgroundColor: Color(0xFF23262B),
+            textTheme: TextTheme(
+              bodyLarge: TextStyle(color: Colors.white),
+              bodyMedium: TextStyle(color: Colors.white70),
+              titleLarge: TextStyle(color: Colors.white),
+            ),
+          ),
           themeMode: mode,
           debugShowCheckedModeBanner: false,
           home: const OnboardingScreen(),
