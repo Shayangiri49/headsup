@@ -5,11 +5,25 @@ import '../models/company_model.dart';
 
 class CandidatePopupForm extends StatefulWidget {
   final String initialPhone;
-  final VoidCallback onBookInterview;
+  final String? initialName;
+  final String? initialRole;
+  final String? initialLocation;
+  final String? initialQualification;
+  final String? initialExperience;
+  final String? initialInterviewTime;
+  final bool onlyEditTime;
+  final void Function(Map<String, dynamic> candidateData) onBookInterview;
 
   const CandidatePopupForm({
     super.key,
     required this.initialPhone,
+    this.initialName,
+    this.initialRole,
+    this.initialLocation,
+    this.initialQualification,
+    this.initialExperience,
+    this.initialInterviewTime,
+    this.onlyEditTime = false,
     required this.onBookInterview,
   });
 
@@ -23,6 +37,7 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
   final _lastNameController = TextEditingController();
   final _ageController = TextEditingController();
   final _mobileController = TextEditingController();
+  final _experienceController = TextEditingController();
   
   // Selection states
   String? selectedLocality;
@@ -52,10 +67,29 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
   void initState() {
     super.initState();
     _mobileController.text = widget.initialPhone;
-    // Set default values to match the screenshot
-    _firstNameController.text = 'Sumona';
-    _ageController.text = '26';
-    _mobileController.text = '9600786500';
+    // Use initial values if provided, otherwise leave empty
+    if (widget.initialName != null && widget.initialName!.isNotEmpty) {
+      final nameParts = widget.initialName!.split(' ');
+      _firstNameController.text = nameParts.first;
+      if (nameParts.length > 1) {
+        _lastNameController.text = nameParts.sublist(1).join(' ');
+      }
+    }
+    if (widget.initialExperience != null) {
+      _experienceController.text = widget.initialExperience!;
+    }
+    // Age is not passed, so leave as is unless you add initialAge
+    // Set other fields if initial values are provided
+    if (widget.initialLocation != null) {
+      selectedLocality = widget.initialLocation;
+    }
+    if (widget.initialRole != null) {
+      selectedJobCategory = widget.initialRole;
+    }
+    if (widget.initialQualification != null && widget.initialQualification!.isNotEmpty) {
+      selectedQualifications = widget.initialQualification!.split(',').map((q) => q.trim()).toList();
+    }
+    // Interview time is handled in the date/time picker logic
     _loadDataFromDatabase();
   }
 
@@ -186,7 +220,19 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
         );
         return;
       }
-      widget.onBookInterview();
+      widget.onBookInterview({
+        'name': _firstNameController.text + (" ${_lastNameController.text}").trim(),
+        'experience': _experienceController.text,
+        'role': selectedJobCategory ?? '',
+        'age': int.tryParse(_ageController.text) ?? 0,
+        'location': selectedLocality ?? '',
+        'qualification': selectedQualifications.isNotEmpty ? selectedQualifications.join(', ') : '',
+        'addedDate': DateTime.now().toString().split(' ')[0],
+        'status': 'active',
+        'rating': 0.0,
+        'notes': '',
+        'phone': _mobileController.text,
+      });
     }
   }
 
@@ -453,6 +499,17 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
                               }
                               return null;
                             },
+                          ),
+                          const SizedBox(height: 16),
+                          // Experience
+                          TextFormField(
+                            controller: _experienceController,
+                            decoration: const InputDecoration(
+                              labelText: 'Experience',
+                              hintText: 'e.g. 2 years, 6 months',
+                              border: UnderlineInputBorder(),
+                              contentPadding: EdgeInsets.symmetric(vertical: 8),
+                            ),
                           ),
                           const SizedBox(height: 16),
                           // Mobile Number

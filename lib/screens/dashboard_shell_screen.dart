@@ -15,13 +15,6 @@ class DashboardShellScreen extends StatefulWidget {
 class _DashboardShellScreenState extends State<DashboardShellScreen> {
   int _selectedIndex = 0; // Default to Home tab
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    HomeTabScreen(),
-    CandidatesTabScreen(),
-    JobsTabScreen(),
-    ApplicationsTabScreen(),
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -30,8 +23,14 @@ class _DashboardShellScreenState extends State<DashboardShellScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> widgetOptions = [
+      HomeTabScreen(),
+      CandidatesTabScreen(onBackToHome: () => setState(() => _selectedIndex = 0)),
+      JobsTabScreen(onBackToHome: () => setState(() => _selectedIndex = 0)),
+      ApplicationsTabScreen(onBackToHome: () => setState(() => _selectedIndex = 0)),
+    ];
     return Scaffold(
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: widgetOptions[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

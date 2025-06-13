@@ -3,9 +3,11 @@ import '../utils/app_colors.dart';
 import '../services/notification_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../data/user_role.dart';
 
 class ApplicationsTabScreen extends StatefulWidget {
-  const ApplicationsTabScreen({super.key});
+  final VoidCallback onBackToHome;
+  const ApplicationsTabScreen({super.key, required this.onBackToHome});
 
   @override
   State<ApplicationsTabScreen> createState() => _ApplicationsTabScreenState();
@@ -99,129 +101,139 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+      // Navigate to home tab (adjust route name if needed)
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+      return false;
+      },
+      child: Scaffold(
       backgroundColor: lightGray,
       appBar: AppBar(
-        title: const Text('Application'),
-        backgroundColor: backgroundWhite,
-        elevation: 1,
-        titleTextStyle: const TextStyle(
-          color: textDark,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-        actions: [
-          // Filter dropdown
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list, color: textDark),
-            onSelected: (String value) {
-              setState(() {
-                selectedFilter = value;
-              });
-            },
-            itemBuilder: (BuildContext context) => filterOptions.map((String choice) {
-              return PopupMenuItem<String>(
-                value: choice,
-                child: Row(
-                  children: [
-                    if (selectedFilter == choice)
-                      const Icon(Icons.check, color: primaryBlue, size: 20),
-                    if (selectedFilter == choice) const SizedBox(width: 8),
-                    Text(choice),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
-        ],
+      leading: IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: widget.onBackToHome,
+      ),
+      title: const Text('Application'),
+      backgroundColor: backgroundWhite,
+      elevation: 1,
+      titleTextStyle: const TextStyle(
+      color: textDark,
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      ),
+      actions: [
+      // Filter dropdown
+      PopupMenuButton<String>(
+      icon: const Icon(Icons.filter_list, color: textDark),
+      onSelected: (String value) {
+      setState(() {
+      selectedFilter = value;
+      });
+      },
+      itemBuilder: (BuildContext context) => filterOptions.map((String choice) {
+      return PopupMenuItem<String>(
+      value: choice,
+      child: Row(
+      children: [
+      if (selectedFilter == choice)
+      const Icon(Icons.check, color: primaryBlue, size: 20),
+      if (selectedFilter == choice) const SizedBox(width: 8),
+      Text(choice),
+      ],
+      ),
+      );
+      }).toList(),
+      ),
+      ],
       ),
       body: Column(
         children: [
-          // Filter status bar
-          if (selectedFilter != 'All')
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              color: primaryBlue.withOpacity(0.1),
-              child: Row(
-                children: [
-                  Icon(Icons.filter_alt, color: primaryBlue, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Showing $selectedFilter applications (${filteredApplications.length})',
-                    style: const TextStyle(
-                      color: primaryBlue,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedFilter = 'All';
-                      });
-                    },
-                    child: const Text(
-                      'Clear',
-                      style: TextStyle(
-                        color: primaryBlue,
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                ],
+        // Filter status bar
+        if (selectedFilter != 'All')
+          Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          color: primaryBlue.withOpacity(0.1),
+          child: Row(
+            children: [
+            Icon(Icons.filter_alt, color: primaryBlue, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              'Showing $selectedFilter applications (${filteredApplications.length})',
+              style: const TextStyle(
+              color: primaryBlue,
+              fontWeight: FontWeight.w500,
               ),
             ),
-          
-          // Applications list
-          Expanded(
-            child: filteredApplications.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.article_outlined,
-                          size: 80,
-                          color: textSecondary.withOpacity(0.5),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          selectedFilter == 'All' 
-                              ? 'No applications yet'
-                              : 'No $selectedFilter applications',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: textSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Applications will appear here when candidates apply',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: textSecondary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filteredApplications.length,
-                    itemBuilder: (context, index) {
-                      return _buildApplicationCard(filteredApplications[index], index);
-                    },
-                  ),
+            const Spacer(),
+            GestureDetector(
+              onTap: () {
+              setState(() {
+                selectedFilter = 'All';
+              });
+              },
+              child: const Text(
+              'Clear',
+              style: TextStyle(
+                color: primaryBlue,
+                fontWeight: FontWeight.w500,
+                decoration: TextDecoration.underline,
+              ),
+              ),
+            ),
+            ],
           ),
+          ),
+        
+        // Applications list
+        Expanded(
+          child: filteredApplications.isEmpty
+            ? Center(
+              child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                Icons.article_outlined,
+                size: 80,
+                color: textSecondary.withOpacity(0.5),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                selectedFilter == 'All' 
+                  ? 'No applications yet'
+                  : 'No $selectedFilter applications',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: textSecondary,
+                ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                'Applications will appear here when candidates apply',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: textSecondary,
+                ),
+                textAlign: TextAlign.center,
+                ),
+              ],
+              ),
+            )
+            : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: filteredApplications.length,
+              itemBuilder: (context, index) {
+              return _buildApplicationCard(filteredApplications[index], index);
+              },
+            ),
+        ),
         ],
+      ),
       ),
     );
   }
-
   Widget _buildApplicationCard(Map<String, dynamic> application, int index) {
     Color getStatusColor(String status) {
       switch (status) {
@@ -235,6 +247,7 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
           return Colors.orange;
       }
     }
+    
 
     String getStatusText(String status) {
       switch (status) {
@@ -398,63 +411,64 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                 ),
                 const SizedBox(width: 12),
                 
-                // More options (3-dot menu)
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                // More options (3-dot menu, admin only)
+                if (currentUserRole == 'admin')
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, color: textSecondary),
+                      onSelected: (String value) {
+                        _handleStatusChange(application, value, index);
+                      },
+                      itemBuilder: (BuildContext context) => [
+                        PopupMenuItem<String>(
+                          value: 'selected',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.check_circle_outline,
+                                color: Colors.blue,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text('Selected'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'rejected',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.cancel_outlined,
+                                color: Colors.red,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text('Rejected'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'joined',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.person_add_outlined,
+                                color: Colors.green,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text('Joined'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert, color: textSecondary),
-                    onSelected: (String value) {
-                      _handleStatusChange(application, value, index);
-                    },
-                    itemBuilder: (BuildContext context) => [
-                      PopupMenuItem<String>(
-                        value: 'selected',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.check_circle_outline,
-                              color: Colors.blue,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            const Text('Selected'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem<String>(
-                        value: 'rejected',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.cancel_outlined,
-                              color: Colors.red,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            const Text('Rejected'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem<String>(
-                        value: 'joined',
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.person_add_outlined,
-                              color: Colors.green,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            const Text('Joined'),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ],

@@ -3,7 +3,8 @@ import '../utils/app_colors.dart';
 import '../models/job_model.dart';
 
 class JobsTabScreen extends StatefulWidget {
-  const JobsTabScreen({super.key});
+  final VoidCallback onBackToHome;
+  const JobsTabScreen({super.key, required this.onBackToHome});
 
   @override
   State<JobsTabScreen> createState() => _JobsTabScreenState();
@@ -79,132 +80,142 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+      return false;
+      },
+      child: Scaffold(
       backgroundColor: lightGray,
       appBar: AppBar(
-        title: const Text('Jobs'),
-        backgroundColor: backgroundWhite,
-        elevation: 1,
-        titleTextStyle: const TextStyle(
-          color: textDark,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-        ),
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.filter_list, color: textDark),
-                onPressed: () {
-                  setState(() {
-                    showFilterMenu = !showFilterMenu;
-                  });
-                },
-              ),
-            ],
-          ),
-        ],
+      leading: IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: widget.onBackToHome,
+      ),
+      title: const Text('Jobs'),
+      backgroundColor: backgroundWhite,
+      elevation: 1,
+      titleTextStyle: const TextStyle(
+      color: textDark,
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+      ),
+      actions: [
+      Stack(
+      children: [
+      IconButton(
+      icon: const Icon(Icons.filter_list, color: textDark),
+      onPressed: () {
+      setState(() {
+      showFilterMenu = !showFilterMenu;
+      });
+      },
+      ),
+      ],
+      ),
+      ],
       ),
       body: Stack(
         children: [
-          Column(
-            children: [
-              // Filter Menu
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                height: showFilterMenu ? 120 : 0,
-                child: Container(
-                  color: backgroundWhite,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Text(
-                          'Filter Menu...',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: textSecondary,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        height: 60,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: filterOptions.length,
-                          itemBuilder: (context, index) {
-                            final option = filterOptions[index];
-                            final isSelected = selectedFilter == option;
-                            return Container(
-                              margin: const EdgeInsets.only(right: 12),
-                              child: FilterChip(
-                                label: Text(option),
-                                selected: isSelected,
-                                onSelected: (selected) {
-                                  setState(() {
-                                    selectedFilter = option;
-                                    showFilterMenu = false;
-                                  });
-                                },
-                                backgroundColor: backgroundWhite,
-                                selectedColor: primaryBlue.withOpacity(0.2),
-                                labelStyle: TextStyle(
-                                  color: isSelected ? primaryBlue : textSecondary,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                ),
-                                side: BorderSide(
-                                  color: isSelected ? primaryBlue : borderColor,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
+        Column(
+          children: [
+          // Filter Menu
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            height: showFilterMenu ? 120 : 0,
+            child: Container(
+            color: backgroundWhite,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                'Filter Menu...',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: textSecondary,
+                ),
                 ),
               ),
-              // Job List
-              Expanded(
+              Container(
+                height: 60,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: filteredJobs.length,
-                  itemBuilder: (context, index) {
-                    final job = filteredJobs[index];
-                    final isExpanded = expandedJobId == job.id;
-                    
-                    return Column(
-                      children: [
-                        JobCard(
-                          job: job,
-                          isExpanded: isExpanded,
-                          onFullDetailsPressed: () {
-                            setState(() {
-                              expandedJobId = isExpanded ? null : job.id;
-                            });
-                          },
-                        ),
-                        if (isExpanded)
-                          JobDetailsPanel(
-                            job: job,
-                            onClose: () {
-                              setState(() {
-                                expandedJobId = null;
-                              });
-                            },
-                          ),
-                        const SizedBox(height: 16),
-                      ],
-                    );
+                scrollDirection: Axis.horizontal,
+                itemCount: filterOptions.length,
+                itemBuilder: (context, index) {
+                  final option = filterOptions[index];
+                  final isSelected = selectedFilter == option;
+                  return Container(
+                  margin: const EdgeInsets.only(right: 12),
+                  child: FilterChip(
+                    label: Text(option),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                    setState(() {
+                      selectedFilter = option;
+                      showFilterMenu = false;
+                    });
+                    },
+                    backgroundColor: backgroundWhite,
+                    selectedColor: primaryBlue.withOpacity(0.2),
+                    labelStyle: TextStyle(
+                    color: isSelected ? primaryBlue : textSecondary,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                    side: BorderSide(
+                    color: isSelected ? primaryBlue : borderColor,
+                    ),
+                  ),
+                  );
+                },
+                ),
+              ),
+              ],
+            ),
+            ),
+          ),
+          // Job List
+          Expanded(
+            child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: filteredJobs.length,
+            itemBuilder: (context, index) {
+              final job = filteredJobs[index];
+              final isExpanded = expandedJobId == job.id;
+
+              return Column(
+              children: [
+                JobCard(
+                job: job,
+                isExpanded: isExpanded,
+                onFullDetailsPressed: () {
+                  setState(() {
+                  expandedJobId = isExpanded ? null : job.id;
+                  });
+                },
+                ),
+                if (isExpanded)
+                JobDetailsPanel(
+                  job: job,
+                  onClose: () {
+                  setState(() {
+                    expandedJobId = null;
+                  });
                   },
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+              ],
+              );
+            },
+            ),
           ),
+          ],
+        ),
         ],
+      ),
       ),
     );
   }

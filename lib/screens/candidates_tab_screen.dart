@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../services/notification_service.dart';
+import '../../data/candidates_data.dart' as candidates_data;
+import '../widgets/candidate_popup_form.dart';
+import '../widgets/edit_candidate_popup.dart';
+import '../../data/user_role.dart';
 
 class CandidatesTabScreen extends StatefulWidget {
-  const CandidatesTabScreen({super.key});
+  final VoidCallback onBackToHome;
+  const CandidatesTabScreen({super.key, required this.onBackToHome});
 
   @override
   State<CandidatesTabScreen> createState() => _CandidatesTabScreenState();
@@ -25,128 +30,8 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
   static const Color lightRed = Color(0xFFE57373);
 
   // All candidates data with additional fields for popup
-  List<Map<String, dynamic>> allCandidates = [
-    {
-      'name': 'Sumona Giri',
-      'experience': '3 years',
-      'role': 'UI/UX Designer',
-      'age': 28,
-      'location': 'Hsr, Layout',
-      'qualification': "Master's Degree",
-      'addedDate': '19 Jan 2025',
-      'status': 'active',
-      'rating': 4.5,
-      'notes': 'Experienced in Figma, Adobe XD, and Sketch. Strong portfolio in mobile app design.',
-    },
-    {
-      'name': 'Priya Sharma',
-      'experience': '3+ Years', 
-      'role': 'Marketing',
-      'age': 28,
-      'location': 'Mumbai',
-      'qualification': 'MBA',
-      'addedDate': '18 Jan 2025',
-      'status': 'active',
-      'rating': 4.2,
-      'notes': 'Digital marketing specialist with Google Ads certification.',
-    },
-    {
-      'name': 'Rohit Patel',
-      'experience': '2+ Years',
-      'role': 'Sales Executive', 
-      'age': 24,
-      'location': 'Delhi',
-      'qualification': 'B.COM',
-      'addedDate': '17 Jan 2025',
-      'status': 'active',
-      'rating': 3.8,
-      'notes': 'Excellent communication skills and proven sales track record.',
-    },
-    {
-      'name': 'Anjali Singh',
-      'experience': '4+ Years',
-      'role': 'HR Executive',
-      'age': 26,
-      'location': 'Pune',
-      'qualification': 'MBA HR',
-      'addedDate': '16 Jan 2025',
-      'status': 'active',
-      'rating': 4.6,
-      'notes': 'Specializes in talent acquisition and employee engagement.',
-    },
-    {
-      'name': 'Vikram Joshi',
-      'experience': '6+ Years',
-      'role': 'Team Lead',
-      'age': 30,
-      'location': 'Hyderabad',
-      'qualification': 'B.TECH',
-      'addedDate': '15 Jan 2025',
-      'status': 'active',
-      'rating': 4.8,
-      'notes': 'Strong leadership skills with experience in agile methodologies.',
-    },
-    {
-      'name': 'Sneha Reddy',
-      'experience': '1+ Years',
-      'role': 'Junior Sales',
-      'age': 23,
-      'location': 'Chennai',
-      'qualification': 'BBA',
-      'addedDate': '14 Jan 2025',
-      'status': 'active',
-      'rating': 3.5,
-      'notes': 'Enthusiastic fresher with good learning attitude.',
-    },
-    {
-      'name': 'Arjun Mehta',
-      'experience': '7+ Years',
-      'role': 'Senior Manager',
-      'age': 32,
-      'location': 'Bengaluru',
-      'qualification': 'MBA',
-      'addedDate': '13 Jan 2025',
-      'status': 'active',
-      'rating': 4.9,
-      'notes': 'Proven track record in project management and team development.',
-    },
-    {
-      'name': 'Kavya Nair',
-      'experience': '3+ Years',
-      'role': 'Business Analyst',
-      'age': 27,
-      'location': 'Kochi',
-      'qualification': 'MCA',
-      'addedDate': '12 Jan 2025',
-      'status': 'active',
-      'rating': 4.3,
-      'notes': 'Expert in data analysis and process optimization.',
-    },
-    {
-      'name': 'Rahul Gupta',
-      'experience': '2+ Years',
-      'role': 'Customer Service',
-      'age': 25,
-      'location': 'Noida',
-      'qualification': 'B.SC',
-      'addedDate': '11 Jan 2025',
-      'status': 'active',
-      'rating': 4.0,
-      'notes': 'Excellent customer handling skills with multilingual support.',
-    },
-    {
-      'name': 'Deepika Rao',
-      'experience': '5+ Years',
-      'role': 'Operations Manager',
-      'age': 29,
-      'location': 'Bengaluru',
-      'qualification': 'B.TECH',
-      'addedDate': '10 Jan 2025',
-      'status': 'active',
-      'rating': 4.7,
-      'notes': 'Operations excellence with lean management expertise.',
-    },
-  ];
+  // Use the global candidates list
+  List<Map<String, dynamic>> get allCandidates => candidates_data.globalCandidates;
 
   @override
   void initState() {
@@ -278,26 +163,36 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                         const SizedBox(width: 8),
                         Row(
                           children: List.generate(5, (starIndex) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                setState(() {
-                                  allCandidates[index]['rating'] = starIndex + 1.0;
-                                  _filterCandidates(_searchQuery);
-                                });
-                                // Reopen the dialog to reflect the new rating
-                                Future.delayed(const Duration(milliseconds: 200), () {
-                                  _showCandidateDetails(allCandidates[index], index);
-                                });
-                              },
-                              child: Icon(
+                            if (currentUserRole == 'admin') {
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  setState(() {
+                                    allCandidates[index]['rating'] = starIndex + 1.0;
+                                    _filterCandidates(_searchQuery);
+                                  });
+                                  // Reopen the dialog to reflect the new rating
+                                  Future.delayed(const Duration(milliseconds: 200), () {
+                                    _showCandidateDetails(allCandidates[index], index);
+                                  });
+                                },
+                                child: Icon(
+                                  starIndex < candidate['rating'].floor()
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  color: Colors.amber,
+                                  size: 24,
+                                ),
+                              );
+                            } else {
+                              return Icon(
                                 starIndex < candidate['rating'].floor()
                                     ? Icons.star
                                     : Icons.star_border,
                                 color: Colors.amber,
                                 size: 24,
-                              ),
-                            );
+                              );
+                            }
                           }),
                         ),
                       ],
@@ -440,7 +335,75 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-                
+
+                // Action buttons: Only Reschedule for user
+                if (currentUserRole != 'admin')
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Dialog(
+                                  insetPadding: const EdgeInsets.all(16),
+                                  child: Container(
+                                    width: double.infinity,
+                                    constraints: BoxConstraints(
+                                      maxHeight: MediaQuery.of(context).size.height * 0.9,
+                                    ),
+                                    child: CandidatePopupForm(
+                                      initialPhone: candidate['phone'] ?? '',
+                                      initialName: candidate['name'],
+                                      initialRole: candidate['role'],
+                                      initialLocation: candidate['location'],
+                                      initialQualification: candidate['qualification'],
+                                      initialExperience: candidate['experience'],
+                                      initialInterviewTime: candidate['interviewTime'],
+                                      onlyEditTime: true,
+                                      onBookInterview: (candidateData) {
+                                        Navigator.pop(context);
+                                        setState(() {
+                                          allCandidates[index]['interviewTime'] = candidateData['interviewTime'];
+                                        });
+                                        _notificationService.addNotification(
+                                          title: 'Interview Rescheduled',
+                                          message: 'Interview rescheduled with ${candidate['name']}',
+                                          type: NotificationType.reschedule,
+                                          candidateName: candidate['name'],
+                                        );
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('Interview rescheduled with ${candidate['name']}'),
+                                            backgroundColor: Colors.orange,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.schedule, size: 18),
+                          label: const Text('Reschedule'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: lightOrange,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                const SizedBox(height: 24),
+
                 // Close button
                 SizedBox(
                   width: double.infinity,
@@ -640,12 +603,67 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
 
   // Add new candidate
   void _addNewCandidate() {
-    print('Add new candidate functionality');
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: const EdgeInsets.all(16),
+          child: Container(
+            width: double.infinity,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.9,
+            ),
+            child: CandidatePopupForm(
+              initialPhone: '',
+              initialName: '',
+              initialRole: '',
+              initialLocation: '',
+              initialQualification: '',
+              initialExperience: '',
+              initialInterviewTime: '',
+              onlyEditTime: false,
+              onBookInterview: (candidateData) {
+                Navigator.pop(context);
+                setState(() {
+                  candidates_data.globalCandidates.add(candidateData);
+                  _filterCandidates(_searchQuery);
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Candidate added successfully'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
   }
 
   // Edit candidate
   void _editCandidate(int index) {
-    print('Edit candidate: ${allCandidates[index]['name']}');
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return EditCandidatePopup(
+          candidate: allCandidates[index],
+          onSave: (updatedCandidate) {
+            setState(() {
+              allCandidates[index] = updatedCandidate;
+              _filterCandidates(_searchQuery);
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Candidate details updated'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   // QuickActionsHeaderDelegate class for the persistent header (removed duplicate definition from inside CandidatesTabScreen)
@@ -746,216 +764,223 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+      return false;
+      },
+      child: Scaffold(
       backgroundColor: lightGray,
       appBar: AppBar(
-        title: _isSearching ? null : Row(
-          children: [
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: widget.onBackToHome,
+        ),
+        title: _isSearching
+          ? null
+          : Row(
+            children: [
             const Text('Candidates List'),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: primaryBlue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+              color: primaryBlue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                '${filteredCandidates.length}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: primaryBlue,
-                  fontWeight: FontWeight.bold,
-                ),
+              '${filteredCandidates.length}',
+              style: const TextStyle(
+                fontSize: 12,
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+              ),
               ),
             ),
-          ],
-        ),
+            ],
+          ),
         backgroundColor: backgroundWhite,
         elevation: 1,
         titleTextStyle: const TextStyle(
-          color: textDark,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
+        color: textDark,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
         ),
         actions: [
-          if (!_isSearching) ...[
-            IconButton(
-              icon: const Icon(Icons.search, color: textDark),
-              onPressed: () {
-                setState(() {
-                  _isSearching = true;
-                });
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.filter_list, color: textDark),
-              onPressed: () => _showFilterDialog(context),
-            ),
-          ] else ...[
-            IconButton(
-              icon: const Icon(Icons.close, color: textDark),
-              onPressed: _clearSearch,
-            ),
-          ],
+        if (!_isSearching) ...[
+          IconButton(
+          icon: const Icon(Icons.search, color: textDark),
+          onPressed: () {
+            setState(() {
+            _isSearching = true;
+            });
+          },
+          ),
+          IconButton(
+          icon: const Icon(Icons.filter_list, color: textDark),
+          onPressed: () => _showFilterDialog(context),
+          ),
+        ] else ...[
+          IconButton(
+          icon: const Icon(Icons.close, color: textDark),
+          onPressed: _clearSearch,
+          ),
         ],
-        // Search bar
-        bottom: _isSearching ? PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: Padding(
+        ],
+        bottom: _isSearching
+          ? PreferredSize(
+            preferredSize: const Size.fromHeight(60),
+            child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _searchController,
               autofocus: true,
               decoration: InputDecoration(
-                hintText: 'Search by name, role, location, qualification...',
-                prefixIcon: const Icon(Icons.search, color: textSecondary),
-                suffixIcon: _searchQuery.isNotEmpty 
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, color: textSecondary),
-                        onPressed: _clearSearch,
-                      )
-                    : null,
-                filled: true,
-                fillColor: backgroundWhite,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              hintText: 'Search by name, role, location, qualification...',
+              prefixIcon: const Icon(Icons.search, color: textSecondary),
+              suffixIcon: _searchQuery.isNotEmpty
+                ? IconButton(
+                  icon: const Icon(Icons.clear, color: textSecondary),
+                  onPressed: _clearSearch,
+                  )
+                : null,
+              filled: true,
+              fillColor: backgroundWhite,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
             ),
-          ),
-        ) : null,
+            ),
+          )
+          : null,
       ),
       body: RefreshIndicator(
         onRefresh: _refreshCandidates,
         child: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            // Search results header
-            if (_isSearching) ...[
-              SliverToBoxAdapter(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Icon(
-                        filteredCandidates.isEmpty ? Icons.search_off : Icons.search,
-                        color: textSecondary,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          filteredCandidates.isEmpty 
-                              ? 'No candidates found for "$_searchQuery"'
-                              : '${filteredCandidates.length} candidate${filteredCandidates.length == 1 ? '' : 's'} found for "$_searchQuery"',
-                          style: const TextStyle(
-                            color: textSecondary,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+        controller: _scrollController,
+        slivers: [
+          // Search results header
+          if (_isSearching) ...[
+          SliverToBoxAdapter(
+            child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+              Icon(
+                filteredCandidates.isEmpty ? Icons.search_off : Icons.search,
+                color: textSecondary,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                filteredCandidates.isEmpty
+                  ? 'No candidates found for "$_searchQuery"'
+                  : '${filteredCandidates.length} candidate${filteredCandidates.length == 1 ? '' : 's'} found for "$_searchQuery"',
+                style: const TextStyle(
+                  color: textSecondary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
                 ),
               ),
-            ],
-            
-            // Quick actions header (only when not searching)
-            if (!_isSearching)
-            const SliverPersistentHeader(
-              pinned: false,
-              floating: true,
-              delegate: _QuickActionsHeaderDelegate(),
+              ],
             ),
-            
-            // Candidates list
-            if (filteredCandidates.isEmpty && _isSearching) ...[
-              SliverFillRemaining(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.person_search,
-                        size: 80,
-                        color: textSecondary.withOpacity(0.5),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'No candidates found',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Try searching with different keywords',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: textSecondary.withOpacity(0.7),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        onPressed: _clearSearch,
-                        icon: const Icon(Icons.clear_all),
-                        label: const Text('Clear Search'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryBlue,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ] else ...[
-              SliverPadding(
-                padding: const EdgeInsets.all(16.0),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final candidateIndex = allCandidates.indexOf(filteredCandidates[index]);
-                      return _buildCandidateCard(filteredCandidates[index], candidateIndex);
-                    },
-                    childCount: filteredCandidates.length,
-                  ),
-                ),
-              ),
-              
-              // End of list indicator
-              if (!_isSearching)
-                SliverToBoxAdapter(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    child: const Center(
-                      child: Text(
-                        'End of candidates list',
-                        style: TextStyle(
-                          color: textSecondary,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+            ),
+          ),
           ],
+
+          // Quick actions header (only when not searching)
+          if (!_isSearching)
+          const SliverPersistentHeader(
+            pinned: false,
+            floating: true,
+            delegate: _QuickActionsHeaderDelegate(),
+          ),
+
+          // Candidates list
+          if (filteredCandidates.isEmpty && _isSearching) ...[
+          SliverFillRemaining(
+            child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+              Icon(
+                Icons.person_search,
+                size: 80,
+                color: textSecondary.withOpacity(0.5),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'No candidates found',
+                style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: textSecondary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Try searching with different keywords',
+                style: TextStyle(
+                fontSize: 14,
+                color: textSecondary.withOpacity(0.7),
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: _clearSearch,
+                icon: const Icon(Icons.clear_all),
+                label: const Text('Clear Search'),
+                style: ElevatedButton.styleFrom(
+                backgroundColor: primaryBlue,
+                foregroundColor: Colors.white,
+                ),
+              ),
+              ],
+            ),
+            ),
+          ),
+          ] else ...[
+          SliverPadding(
+            padding: const EdgeInsets.all(16.0),
+            sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+              final candidateIndex = allCandidates.indexOf(filteredCandidates[index]);
+              return _buildCandidateCard(filteredCandidates[index], candidateIndex);
+              },
+              childCount: filteredCandidates.length,
+            ),
+            ),
+          ),
+
+          // End of list indicator
+          if (!_isSearching)
+            SliverToBoxAdapter(
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              child: const Center(
+              child: Text(
+                'End of candidates list',
+                style: TextStyle(
+                color: textSecondary,
+                fontSize: 14,
+                ),
+              ),
+              ),
+            ),
+            ),
+          ],
+        ],
         ),
       ),
-      
-      // Floating Action Button (hide when searching)
-      floatingActionButton: _isSearching ? null : FloatingActionButton.extended(
-        onPressed: _addNewCandidate,
-        backgroundColor: primaryBlue,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.person_add),
-        label: const Text('Add Candidate'),
+
+      // Floating Action Button removed as per requirements
+      floatingActionButton: null,
       ),
     );
   }
@@ -1086,11 +1111,18 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                     ],
                   ),
                 ),
-                // Edit button
+                // Edit button (always visible)
                 IconButton(
-                  onPressed: () => _editCandidate(index),
-                  icon: const Icon(Icons.edit_outlined, color: textSecondary),
-                  tooltip: 'Edit Candidate',
+                onPressed: () => _editCandidate(index),
+                icon: const Icon(Icons.edit_outlined, color: textSecondary),
+                tooltip: 'Edit Candidate',
+                ),
+                // Delete button (admin only)
+                if (currentUserRole == 'admin')
+                IconButton(
+                onPressed: () => _removeCandidate(index),
+                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                tooltip: 'Delete Candidate',
                 ),
               ],
             ),
@@ -1112,7 +1144,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                     ],
                   ),
                 ),
-                // Rating display
+                // Rating display (always show)
                 Column(
                   children: [
                     Row(
@@ -1147,56 +1179,161 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
             // Action buttons
             Row(
               children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _goForInterview(index),
-                    icon: const Icon(Icons.calendar_month, size: 18),
-                    label: const Text('Interview'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: lightGreen,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                if (currentUserRole == 'admin') ...[
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _goForInterview(index),
+                      icon: const Icon(Icons.calendar_month, size: 18),
+                      label: const Text('Interview'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lightGreen,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _reschedule(index),
-                    icon: const Icon(Icons.schedule, size: 18),
-                    label: const Text('Reschedule'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: lightOrange,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (dialogContext) {
+                            return Dialog(
+                              insetPadding: const EdgeInsets.all(16),
+                              child: Container(
+                                width: double.infinity,
+                                constraints: BoxConstraints(
+                                  maxHeight: MediaQuery.of(context).size.height * 0.9,
+                                ),
+                                child: CandidatePopupForm(
+                                  initialPhone: candidate['phone'] ?? '',
+                                  initialName: candidate['name'],
+                                  initialRole: candidate['role'],
+                                  initialLocation: candidate['location'],
+                                  initialQualification: candidate['qualification'],
+                                  initialExperience: candidate['experience'],
+                                  initialInterviewTime: candidate['interviewTime'],
+                                  onlyEditTime: true,
+                                  onBookInterview: (candidateData) {
+                                    Navigator.pop(dialogContext);
+                                    setState(() {
+                                      allCandidates[index]['interviewTime'] = candidateData['interviewTime'];
+                                    });
+                                    _notificationService.addNotification(
+                                      title: 'Interview Rescheduled',
+                                      message: 'Interview rescheduled with ${candidate['name']}',
+                                      type: NotificationType.reschedule,
+                                      candidateName: candidate['name'],
+                                    );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Interview rescheduled with ${candidate['name']}'),
+                                        backgroundColor: Colors.orange,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.schedule, size: 18),
+                      label: const Text('Reschedule'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lightOrange,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _markReached(index),
-                    icon: const Icon(Icons.close, size: 18),
-                    label: const Text('Reached'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: lightRed,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _markReached(index),
+                      icon: const Icon(Icons.close, size: 18),
+                      label: const Text('Reached'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lightRed,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ] else ...[
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (dialogContext) {
+                            return Dialog(
+                              insetPadding: const EdgeInsets.all(16),
+                              child: Container(
+                                width: double.infinity,
+                                constraints: BoxConstraints(
+                                  maxHeight: MediaQuery.of(context).size.height * 0.9,
+                                ),
+                                child: CandidatePopupForm(
+                                  initialPhone: candidate['phone'] ?? '',
+                                  initialName: candidate['name'],
+                                  initialRole: candidate['role'],
+                                  initialLocation: candidate['location'],
+                                  initialQualification: candidate['qualification'],
+                                  initialExperience: candidate['experience'],
+                                  initialInterviewTime: candidate['interviewTime'],
+                                  onlyEditTime: true,
+                                  onBookInterview: (candidateData) {
+                                    Navigator.pop(dialogContext);
+                                    setState(() {
+                                      allCandidates[index]['interviewTime'] = candidateData['interviewTime'];
+                                    });
+                                    _notificationService.addNotification(
+                                      title: 'Interview Rescheduled',
+                                      message: 'Interview rescheduled with ${candidate['name']}',
+                                      type: NotificationType.reschedule,
+                                      candidateName: candidate['name'],
+                                    );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Interview rescheduled with ${candidate['name']}'),
+                                        backgroundColor: Colors.orange,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.schedule, size: 18),
+                      label: const Text('Reschedule'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lightOrange,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ],

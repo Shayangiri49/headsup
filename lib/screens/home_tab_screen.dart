@@ -3,6 +3,7 @@ import '../services/notification_service.dart' show NotificationItem, Notificati
 import 'package:fl_chart/fl_chart.dart';
 import '../widgets/candidate_popup_form.dart';
 import '../../main.dart' show themeModeNotifier;
+import '../../data/candidates_data.dart' as candidates_data;
 
 class HomeTabScreen extends StatefulWidget {
   const HomeTabScreen({super.key});
@@ -33,7 +34,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
       'closures': 8,
       'attendance': 5,
       'chartData': [8, 12, 15, 10, 18, 12, 20],
-      'labels': ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7'],
+      'labels': ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7'],
       'attendanceData': [5, 4, 5, 3, 5, 4, 5],
     },
     'Monthly': {
@@ -77,12 +78,14 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
               maxHeight: MediaQuery.of(context).size.height * 0.9,
             ),
             child: CandidatePopupForm(
-              initialPhone: _phoneController.text,
-              onBookInterview: () {
-                Navigator.pop(context); // Close popup
-                _phoneController.clear(); // Clear input
-                _navigateToCandidatesTab();
-              },
+            initialPhone: _phoneController.text,
+            onBookInterview: (candidateData) {
+            Navigator.pop(context); // Close popup
+            _phoneController.clear(); // Clear input
+            // Add to global candidates list
+            candidates_data.globalCandidates.add(candidateData);
+            _navigateToCandidatesTab();
+            },
             ),
           ),
         );
@@ -293,7 +296,8 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                                     sideTitles: SideTitles(
                                       showTitles: true,
                                       getTitlesWidget: (value, meta) {
-                                        if (value.toInt() < currentData['labels'].length) {
+                                        // Only show label for integer values within range
+                                        if (value == value.toInt() && value.toInt() >= 0 && value.toInt() < currentData['labels'].length) {
                                           return Text(
                                             currentData['labels'][value.toInt()],
                                             style: TextStyle(fontSize: 10, color: Theme.of(context).textTheme.bodyMedium?.color),

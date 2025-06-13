@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import 'dashboard_shell_screen.dart';
+import '../../data/user_role.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -106,14 +107,14 @@ class LoginScreen extends StatelessWidget {
                     height: 56,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // TODO: Implement Google Sign-In
-                        // For now, navigate to dashboard
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DashboardShellScreen(),
-                          ),
-                        );
+                      // Set role to user and navigate
+                      currentUserRole = 'user';
+                      Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                      builder: (context) => const DashboardShellScreen(),
+                      ),
+                      );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: buttonTextWhite,
@@ -140,12 +141,47 @@ class LoginScreen extends StatelessWidget {
                   ),
                   
                   const SizedBox(height: 32),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+                  // Admin login button for testing
+                  SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                  onPressed: () {
+                  // Set role to admin and navigate
+                  currentUserRole = 'admin';
+                  Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                  builder: (context) => const DashboardShellScreen(),
+                  ),
+                  );
+                  },
+                  style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  ),
+                  ),
+                  icon: const Icon(Icons.admin_panel_settings),
+                  label: const Text(
+                  'Login as Admin',
+                  style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                  ),
+                  ),
+                  ),
+                  ),
+                  const SizedBox(height: 32),
+                  ],
+                  ),
+                  ),
+                  ),
+                  ],
+                  ),
+                  );
+                  }
+                  }
