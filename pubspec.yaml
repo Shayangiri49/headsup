@@ -29,5 +29,5 @@ flutter:
   # Add assets here
   assets:
     - assets/images/rocket-boy.png
-    - assets/images/google_logo.png.
+    - assets/images/google_logo.png
     

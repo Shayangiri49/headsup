@@ -49,10 +49,11 @@ class _EditCandidatePopupState extends State<EditCandidatePopup> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 8,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: SingleChildScrollView(
@@ -62,28 +63,32 @@ class _EditCandidatePopupState extends State<EditCandidatePopup> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.edit, color: Colors.blue, size: 28),
+                  Icon(Icons.edit, color: Theme.of(context).colorScheme.primary, size: 28),
                   const SizedBox(width: 10),
-                  const Text(
+                  Text(
                     'Edit Candidate',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 24),
-              _styledTextField(nameController, 'Name', Icons.person),
+              _styledTextField(context, nameController, 'Name', Icons.person),
               const SizedBox(height: 14),
-              _styledTextField(phoneController, 'Phone', Icons.phone, keyboardType: TextInputType.phone),
+              _styledTextField(context, phoneController, 'Phone', Icons.phone, keyboardType: TextInputType.phone),
               const SizedBox(height: 14),
-              _styledTextField(roleController, 'Role', Icons.work),
+              _styledTextField(context, roleController, 'Role', Icons.work),
               const SizedBox(height: 14),
-              _styledTextField(locationController, 'Location', Icons.location_on),
+              _styledTextField(context, locationController, 'Location', Icons.location_on),
               const SizedBox(height: 14),
-              _styledTextField(qualificationController, 'Qualification', Icons.school),
+              _styledTextField(context, qualificationController, 'Qualification', Icons.school),
               const SizedBox(height: 14),
-              _styledTextField(experienceController, 'Experience', Icons.timeline),
+              _styledTextField(context, experienceController, 'Experience', Icons.timeline),
               const SizedBox(height: 14),
-              _styledTextField(ageController, 'Age', Icons.cake, keyboardType: TextInputType.number),
+              _styledTextField(context, ageController, 'Age', Icons.cake, keyboardType: TextInputType.number),
               const SizedBox(height: 28),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -91,7 +96,7 @@ class _EditCandidatePopupState extends State<EditCandidatePopup> {
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
-                      foregroundColor: Colors.grey[700],
+                      foregroundColor: Theme.of(context).textTheme.bodyMedium?.color,
                       textStyle: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     child: const Text('Cancel'),
@@ -111,7 +116,7 @@ class _EditCandidatePopupState extends State<EditCandidatePopup> {
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                       textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -129,15 +134,18 @@ class _EditCandidatePopupState extends State<EditCandidatePopup> {
     );
   }
 
-  Widget _styledTextField(TextEditingController controller, String label, IconData icon, {TextInputType keyboardType = TextInputType.text}) {
+  Widget _styledTextField(BuildContext context, TextEditingController controller, String label, IconData icon, {TextInputType keyboardType = TextInputType.text}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
+      style: Theme.of(context).textTheme.bodyLarge,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: Colors.blue),
+        labelStyle: Theme.of(context).textTheme.bodyMedium,
+        prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary),
         filled: true,
-        fillColor: Colors.blue.withOpacity(0.06),
+        fillColor: isDark ? Colors.white10 : Colors.blue.withOpacity(0.06),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,

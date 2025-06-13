@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import '../utils/app_colors.dart';
 import '../services/database_service.dart';
 import '../models/company_model.dart';
@@ -15,6 +16,7 @@ class CandidatePopupForm extends StatefulWidget {
   final String? initialInterviewTime;
   final bool onlyEditTime;
   final void Function(Map<String, dynamic> candidateData) onBookInterview;
+  final VoidCallback? onCompanyAdded;
 
   const CandidatePopupForm({
     super.key,
@@ -27,6 +29,7 @@ class CandidatePopupForm extends StatefulWidget {
     this.initialInterviewTime,
     this.onlyEditTime = false,
     required this.onBookInterview,
+    this.onCompanyAdded,
   });
 
   @override
@@ -48,6 +51,7 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
   String? selectedCompanyId;
   String? selectedTimeSlot;
   bool isResumeUploaded = false;
+  String? resumeFileName;
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
   
@@ -105,42 +109,52 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
   }
 
   Future<void> _loadDataFromDatabase() async {
-    try {
-      final databaseService = DatabaseService();
-      final loadedLocalities = await databaseService.getLocalities();
-      final loadedCompanies = await databaseService.getCompanies();
-      setState(() {
-        localities = loadedLocalities;
-        globalCompanies
-          ..clear()
-          ..addAll(loadedCompanies);
-      });
-    } catch (e) {
-      setState(() {
-        localities = [
-          'Marathahalli', 'MG Layout', 'Whitefield', 'Koramangala', 'Bellandur'
-        ];
-        globalCompanies
-          ..clear()
-          ..addAll([
-            Company(id: '1', name: 'Client 1', address: 'The Skyline • Seoul Plaza Rd'),
-            Company(id: '2', name: 'Client 2', address: 'Tech Park • Whitefield'),
-            Company(id: '3', name: 'Client 3', address: 'Business Hub • Koramangala'),
-          ]);
-      });
-    }
+  try {
+  final databaseService = DatabaseService();
+  final loadedLocalities = await databaseService.getLocalities();
+  setState(() {
+  localities = loadedLocalities;
+  });
+  if (globalCompanies.isEmpty) {
+  final loadedCompanies = await databaseService.getCompanies();
+  setState(() {
+  globalCompanies
+  ..clear()
+  ..addAll(loadedCompanies);
+  });
+  }
+  } catch (e) {
+  setState(() {
+  localities = [
+  'Marathahalli', 'MG Layout', 'Whitefield', 'Koramangala', 'Bellandur'
+  ];
+  if (globalCompanies.isEmpty) {
+  globalCompanies
+  ..clear()
+  ..addAll([
+  Company(id: '1', name: 'Client 1', address: 'The Skyline • Seoul Plaza Rd'),
+  Company(id: '2', name: 'Client 2', address: 'Tech Park • Whitefield'),
+  Company(id: '3', name: 'Client 3', address: 'Business Hub • Koramangala'),
+  ]);
+  }
+  });
+  }
   }
 
-  void _simulateFileUpload() {
-    setState(() {
-      isResumeUploaded = true;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Resume uploaded successfully!'),
-        backgroundColor: Colors.green,
-      ),
-    );
+  Future<void> _pickResumeFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['pdf', 'doc', 'docx']);
+    if (result != null && result.files.single.name.isNotEmpty) {
+      setState(() {
+        isResumeUploaded = true;
+        resumeFileName = result.files.single.name;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Resume uploaded successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
   }
 
   Future<void> _selectDate() async {
@@ -212,21 +226,21 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
       _showSelectionErrors = true;
     });
     if (_formKey.currentState!.validate()) {
-      if (selectedLocality == null || 
-          selectedJobCategory == null || 
-          selectedQualifications.isEmpty ||
-          selectedCompanyId == null ||
-          selectedDate == null ||
-          selectedTime == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please fill all required fields'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-      widget.onBookInterview({
+    if (selectedLocality == null || 
+    selectedJobCategory == null || 
+    selectedQualifications.isEmpty ||
+    selectedCompanyId == null ||
+    selectedDate == null ||
+    selectedTime == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+    content: Text('Please fill all required fields'),
+    backgroundColor: Colors.red,
+    ),
+    );
+    return;
+    }
+    widget.onBookInterview({
         'name': ('${_firstNameController.text.trim()} ${_lastNameController.text.trim()}').trim(),
         'experience': _experienceController.text,
         'role': selectedJobCategory ?? '',
@@ -248,11 +262,7 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: textDark,
-        ),
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -396,7 +406,7 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -713,7 +723,7 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
                     _buildSectionTitle('Upload Resume'),
                     const SizedBox(height: 8),
                     GestureDetector(
-                      onTap: _simulateFileUpload,
+                      onTap: _pickResumeFile,
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
@@ -734,7 +744,9 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              isResumeUploaded ? 'Resume_Sumona.pdf' : 'Upload Resume',
+                              isResumeUploaded
+                                  ? (resumeFileName ?? 'Resume.pdf')
+                                  : 'Upload Resume',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: isResumeUploaded ? Colors.green : textSecondary,
@@ -818,6 +830,7 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
                                 );
                                 globalCompanies.add(newCompany);
                                 setState(() {});
+                                widget.onCompanyAdded?.call();
                               }
                             },
                           ),
@@ -851,12 +864,24 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
                                           Expanded(
                                             child: Text(
                                               company.name,
-                                              style: const TextStyle(
+                                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                                 fontSize: 14,
-                                                color: textDark,
+                                                color: Theme.of(context).brightness == Brightness.dark
+                                                    ? Colors.white
+                                                    : Theme.of(context).textTheme.bodyLarge?.color,
                                               ),
                                             ),
                                           ),
+                                          if (currentUserRole == 'admin')
+                                            IconButton(
+                                              icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                              tooltip: 'Remove Company',
+                                              onPressed: () {
+                                                setState(() {
+                                                  globalCompanies.removeWhere((c) => c.id == company.id);
+                                                });
+                                              },
+                                            ),
                                         ],
                                       ),
                                     ),

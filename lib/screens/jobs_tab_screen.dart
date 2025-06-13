@@ -23,23 +23,24 @@ class _StyledTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return TextField(
       controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
+      style: Theme.of(context).textTheme.bodyLarge,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: primaryBlue),
+        labelStyle: Theme.of(context).textTheme.bodyMedium,
+        prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary),
         filled: true,
-        fillColor: lightGray,
+        fillColor: isDark ? Colors.white10 : Colors.blue.withOpacity(0.06),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
-        labelStyle: const TextStyle(color: textSecondary, fontWeight: FontWeight.w500),
       ),
-      style: TextStyle(fontSize: 16, color: Theme.of(context).textTheme.bodyLarge?.color),
     );
   }
 }
