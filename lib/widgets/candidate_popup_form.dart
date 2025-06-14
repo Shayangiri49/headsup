@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import '../utils/app_colors.dart';
 import '../services/database_service.dart';
 import '../models/company_model.dart';
@@ -141,20 +140,14 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
   }
   }
 
-  Future<void> _pickResumeFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['pdf', 'doc', 'docx']);
-    if (result != null && result.files.single.name.isNotEmpty) {
-      setState(() {
-        isResumeUploaded = true;
-        resumeFileName = result.files.single.name;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Resume uploaded successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    }
+  // Resume upload is now a placeholder (no file picking)
+  void _showResumeUploadMessage() {
+  ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(
+  content: Text('Resume upload is disabled in this version.'),
+  backgroundColor: Colors.orange,
+  ),
+  );
   }
 
   Future<void> _selectDate() async {
@@ -723,7 +716,7 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
                     _buildSectionTitle('Upload Resume'),
                     const SizedBox(height: 8),
                     GestureDetector(
-                      onTap: _pickResumeFile,
+                      onTap: _showResumeUploadMessage,
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),

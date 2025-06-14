@@ -25,9 +25,14 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
   List<Map<String, dynamic>> filteredCandidates = [];
 
   // Light button colors
-  static const Color lightGreen = Color(0xFF81C784);
-  static const Color lightOrange = Color(0xFFFFB74D);
-  static const Color lightRed = Color(0xFFE57373);
+  static const Color lightGreen = Color(0xFFD1EFEA); // Interview
+  static const Color lightOrange = Color(0xFFFBE9B7); // Reschedule
+  static const Color lightRed = Color(0xFFFFE8E8); // Reached
+
+  // Button text colors
+  static const Color interviewTextColor = Color(0xFF319582);
+  static const Color rescheduleTextColor = Color(0xFF726E02);
+  static const Color reachedTextColor = Color(0xFFFF3535);
 
   // All candidates data with additional fields for popup
   // Use the global candidates list
@@ -326,7 +331,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: ElevatedButton.icon(
+                        child: ElevatedButton(
                           onPressed: () {
                             Navigator.of(context).pop();
                             showDialog(
@@ -372,11 +377,15 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                               },
                             );
                           },
-                          icon: const Icon(Icons.schedule, size: 18),
-                          label: const Text('Reschedule'),
+                          child: const Text(
+                            'Reschedule',
+                            style: TextStyle(
+                              color: Color(0xFF726E02),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: lightOrange,
-                            foregroundColor: Colors.white,
                             elevation: 0,
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
@@ -1134,13 +1143,12 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
               children: [
                 if (currentUserRole == 'admin') ...[
                   Expanded(
-                    child: ElevatedButton.icon(
+                    child: ElevatedButton(
                       onPressed: () => _goForInterview(index),
-                      icon: const Icon(Icons.calendar_month, size: 18),
-                      label: const Text('Interview'),
+                      child: const Text('Interview'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lightGreen,
-                        foregroundColor: Colors.white,
+                        foregroundColor: interviewTextColor,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
@@ -1151,7 +1159,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton.icon(
+                    child: ElevatedButton(
                       onPressed: () {
                         showDialog(
                           context: context,
@@ -1196,11 +1204,10 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           },
                         );
                       },
-                      icon: const Icon(Icons.schedule, size: 18),
-                      label: const Text('Reschedule'),
+                      child: const Text('Reschedule'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lightOrange,
-                        foregroundColor: Colors.white,
+                        foregroundColor: rescheduleTextColor,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
@@ -1211,13 +1218,12 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: ElevatedButton.icon(
+                    child: ElevatedButton(
                       onPressed: () => _markReached(index),
-                      icon: const Icon(Icons.close, size: 18),
-                      label: const Text('Reached'),
+                      child: const Text('Reached'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lightRed,
-                        foregroundColor: Colors.white,
+                        foregroundColor: reachedTextColor,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
@@ -1228,7 +1234,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   ),
                 ] else ...[
                   Expanded(
-                    child: ElevatedButton.icon(
+                    child: ElevatedButton(
                       onPressed: () {
                         showDialog(
                           context: context,
@@ -1273,11 +1279,15 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           },
                         );
                       },
-                      icon: const Icon(Icons.schedule, size: 18),
-                      label: const Text('Reschedule'),
+                      child: const Text(
+                        'Reschedule',
+                        style: TextStyle(
+                          color: Color(0xFF726E02),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lightOrange,
-                        foregroundColor: Colors.white,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(

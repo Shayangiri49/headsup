@@ -173,8 +173,8 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
                 icon: const Icon(Icons.add),
                 label: const Text('Post Job'),
                 style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                backgroundColor: const Color(0xFF3D99F5),
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
@@ -317,8 +317,8 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
                           }
                           },
                           style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).colorScheme.primary,
-                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                          backgroundColor: const Color(0xFF3D99F5),
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -490,8 +490,8 @@ class JobCard extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onFullDetailsPressed,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  backgroundColor: const Color(0xFF3D99F5),
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
