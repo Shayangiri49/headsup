@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../utils/app_colors.dart';
 import '../services/notification_service.dart';
 import '../data/applications_data.dart';
 import 'package:url_launcher/url_launcher.dart';

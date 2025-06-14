@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../utils/app_colors.dart';
 import 'home_tab_screen.dart';
 import 'candidates_tab_screen.dart';
 import 'applications_tab_screen.dart';

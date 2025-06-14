@@ -13,13 +13,12 @@ class _StyledTextField extends StatelessWidget {
   final TextInputType? keyboardType;
 
   const _StyledTextField({
-    Key? key,
     required this.controller,
     required this.label,
     required this.icon,
     this.maxLines = 1,
     this.keyboardType,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

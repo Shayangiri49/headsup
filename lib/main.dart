@@ -77,12 +77,11 @@ void main() {
               elevation: 8.0,
             ),
             cardColor: Color(0xFF23262B),
-            dialogBackgroundColor: Color(0xFF23262B),
             textTheme: TextTheme(
               bodyLarge: TextStyle(color: Colors.white),
               bodyMedium: TextStyle(color: Colors.white70),
               titleLarge: TextStyle(color: Colors.white),
-            ),
+            ), dialogTheme: DialogThemeData(backgroundColor: Color(0xFF23262B)),
           ),
           themeMode: mode,
           debugShowCheckedModeBanner: false,
