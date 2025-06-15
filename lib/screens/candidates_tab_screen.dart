@@ -377,19 +377,19 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                               },
                             );
                           },
-                          child: const Text(
-                            'Reschedule',
-                            style: TextStyle(
-                              color: Color(0xFF726E02),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: lightOrange,
                             elevation: 0,
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Reschedule',
+                            style: TextStyle(
+                              color: Color(0xFF726E02),
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
@@ -606,8 +606,11 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
               onBookInterview: (candidateData) {
                 Navigator.pop(context);
                 setState(() {
-                  candidates_data.globalCandidates.add(candidateData);
-                  _filterCandidates(_searchQuery);
+                  candidates_data.globalCandidates.insert(0, candidateData);
+                  filteredCandidates = List.from(candidates_data.globalCandidates);
+                  if (_searchQuery.isNotEmpty) {
+                    _filterCandidates(_searchQuery);
+                  }
                 });
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -925,8 +928,9 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
             sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-              final candidateIndex = allCandidates.indexOf(filteredCandidates[index]);
-              return _buildCandidateCard(filteredCandidates[index], candidateIndex);
+              final reversedList = filteredCandidates.reversed.toList();
+              final candidateIndex = allCandidates.indexOf(reversedList[index]);
+              return _buildCandidateCard(reversedList[index], candidateIndex);
               },
               childCount: filteredCandidates.length,
             ),
@@ -1145,7 +1149,6 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => _goForInterview(index),
-                      child: const Text('Interview'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lightGreen,
                         foregroundColor: interviewTextColor,
@@ -1155,6 +1158,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
+                      child: const Text('Interview'),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -1204,7 +1208,6 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           },
                         );
                       },
-                      child: const Text('Reschedule'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lightOrange,
                         foregroundColor: rescheduleTextColor,
@@ -1214,13 +1217,13 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
+                      child: const Text('Reschedule'),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => _markReached(index),
-                      child: const Text('Reached'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lightRed,
                         foregroundColor: reachedTextColor,
@@ -1230,9 +1233,31 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
+                      child: const Text('Reached'),
                     ),
                   ),
                 ] else ...[
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => _goForInterview(index),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lightGreen,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Interview',
+                        style: TextStyle(
+                          color: Color(0xFF319582),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
@@ -1279,6 +1304,14 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           },
                         );
                       },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lightOrange,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                       child: const Text(
                         'Reschedule',
                         style: TextStyle(
@@ -1286,12 +1319,25 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => _markReached(index),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: lightOrange,
+                        backgroundColor: lightRed,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Reached',
+                        style: TextStyle(
+                          color: Color(0xFFFF3535),
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
