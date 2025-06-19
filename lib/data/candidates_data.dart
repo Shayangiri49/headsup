@@ -2,6 +2,7 @@
 
 List<Map<String, dynamic>> globalCandidates = [
   {
+    'id': 1718000000001,
     'name': 'Amit Sharma',
     'role': 'Software Engineer',
     'location': 'Bangalore',
@@ -15,6 +16,7 @@ List<Map<String, dynamic>> globalCandidates = [
     'interviewTime': '2024-06-10 10:00',
   },
   {
+    'id': 1718000000002,
     'name': 'Priya Verma',
     'role': 'UI/UX Designer',
     'location': 'Delhi',
@@ -28,6 +30,7 @@ List<Map<String, dynamic>> globalCandidates = [
     'interviewTime': '2024-06-11 14:00',
   },
   {
+    'id': 1718000000003,
     'name': 'Rahul Kumar',
     'role': 'Product Manager',
     'location': 'Mumbai',
@@ -41,6 +44,7 @@ List<Map<String, dynamic>> globalCandidates = [
     'interviewTime': '2024-06-12 11:30',
   },
   {
+    'id': 1718000000004,
     'name': 'Tanvi Mandal',
     'role': 'HR Recruiter',
     'location': 'Pune',
@@ -54,6 +58,7 @@ List<Map<String, dynamic>> globalCandidates = [
     'interviewTime': '2024-06-13 09:00',
   },
   {
+    'id': 1718000000005,
     'name': 'Suresh Iyer',
     'role': 'DevOps Engineer',
     'location': 'Chennai',

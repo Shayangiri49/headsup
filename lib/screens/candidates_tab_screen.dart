@@ -8,7 +8,8 @@ import '../../data/user_role.dart';
 
 class CandidatesTabScreen extends StatefulWidget {
   final VoidCallback onBackToHome;
-  const CandidatesTabScreen({super.key, required this.onBackToHome});
+  final bool isAdmin;
+  const CandidatesTabScreen({super.key, required this.onBackToHome, this.isAdmin = false});
 
   @override
   State<CandidatesTabScreen> createState() => _CandidatesTabScreenState();
@@ -115,6 +116,11 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           ),
                           SizedBox(height: 4),
                           Text(
+                            'ID: ${candidate['id']}',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 12, color: Colors.grey[600]),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
                             candidate['role'],
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 16),
                           ),
@@ -130,7 +136,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                         }
                       },
                       itemBuilder: (BuildContext context) => [
-                        if (currentUserRole == 'admin')
+                        if (widget.isAdmin)
                           const PopupMenuItem<String>(
                             value: 'remove',
                             child: Row(
@@ -161,7 +167,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                         const SizedBox(width: 8),
                         Row(
                           children: List.generate(5, (starIndex) {
-                            if (currentUserRole == 'admin') {
+                            if (widget.isAdmin) {
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.of(context).pop();
@@ -327,75 +333,6 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                 const SizedBox(height: 24),
 
                 // Action buttons: Only Reschedule for user
-                if (currentUserRole != 'admin')
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Dialog(
-                                  insetPadding: const EdgeInsets.all(16),
-                                  child: Container(
-                                    width: double.infinity,
-                                    constraints: BoxConstraints(
-                                      maxHeight: MediaQuery.of(context).size.height * 0.9,
-                                    ),
-                                    child: CandidatePopupForm(
-                                      initialPhone: candidate['phone'] ?? '',
-                                      initialName: candidate['name'],
-                                      initialRole: candidate['role'],
-                                      initialLocation: candidate['location'],
-                                      initialQualification: candidate['qualification'],
-                                      initialExperience: candidate['experience'],
-                                      initialInterviewTime: candidate['interviewTime'],
-                                      onlyEditTime: true,
-                                      onBookInterview: (candidateData) {
-                                        Navigator.pop(context);
-                                        setState(() {
-                                          allCandidates[index]['interviewTime'] = candidateData['interviewTime'];
-                                        });
-                                        _notificationService.addNotification(
-                                          title: 'Interview Rescheduled',
-                                          message: 'Interview rescheduled with ${candidate['name']}',
-                                          type: NotificationType.reschedule,
-                                          candidateName: candidate['name'],
-                                        );
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text('Interview rescheduled with ${candidate['name']}'),
-                                            backgroundColor: Colors.orange,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: lightOrange,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text(
-                            'Reschedule',
-                            style: TextStyle(
-                              color: Color(0xFF726E02),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                 const SizedBox(height: 24),
 
                 // Close button
@@ -606,8 +543,14 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
               onBookInterview: (candidateData) {
                 Navigator.pop(context);
                 setState(() {
-                  candidates_data.globalCandidates.insert(0, candidateData);
-                  filteredCandidates = List.from(candidates_data.globalCandidates);
+                  // Always assign a unique id to a new candidate
+                  final newCandidate = Map<String, dynamic>.from(candidateData);
+                  newCandidate['id'] = DateTime.now().millisecondsSinceEpoch;
+                  if (!newCandidate.containsKey('interviewTime') || newCandidate['interviewTime'] == null) {
+                    newCandidate['interviewTime'] = '';
+                  }
+                  candidates_data.globalCandidates.insert(0, newCandidate);
+                  filteredCandidates = candidates_data.globalCandidates;
                   if (_searchQuery.isNotEmpty) {
                     _filterCandidates(_searchQuery);
                   }
@@ -654,18 +597,41 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
 
   // Go for interview
   void _goForInterview(int index) {
-    _notificationService.addNotification(
-      title: 'Interview Scheduled',
-      message: 'Interview scheduled with ${allCandidates[index]['name']}',
-      type: NotificationType.interview,
-      candidateName: allCandidates[index]['name'],
-    );
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Interview scheduled with ${allCandidates[index]['name']}'),
-        backgroundColor: Colors.green,
-      ),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm GFI Selection'),
+          content: Text('Mark ${allCandidates[index]['name']} as selected for GFI?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  allCandidates[index]['gfiSelected'] = true;
+                });
+                _notificationService.addNotification(
+                  title: 'Interview Scheduled',
+                  message: 'Interview scheduled with ${allCandidates[index]['name']}',
+                  type: NotificationType.interview,
+                  candidateName: allCandidates[index]['name'],
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Interview scheduled with ${allCandidates[index]['name']}'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -930,7 +896,8 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
               (context, index) {
               final reversedList = filteredCandidates.reversed.toList();
               final candidateIndex = allCandidates.indexOf(reversedList[index]);
-              return _buildCandidateCard(reversedList[index], candidateIndex);
+              // Always use the candidate from allCandidates to ensure 'id' is present
+              return _buildCandidateCard(allCandidates[candidateIndex], candidateIndex);
               },
               childCount: filteredCandidates.length,
             ),
@@ -1034,70 +1001,65 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
           children: [
             // Header with name and edit button
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Candidate Info (expanded to take more space)
+                // Candidate name
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      buildHighlightedText(candidate['name'], _searchQuery),
-                      SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.green, width: 1),
-                            ),
-                            child: Text(
-                              candidate['experience'],
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: 12,
-                                color: Colors.green,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Flexible(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
-                              ),
-                              child: Text(
-                                candidate['role'],
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontSize: 12,
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                  child: buildHighlightedText(candidate['name'], _searchQuery),
                 ),
-                // Edit button (always visible)
                 IconButton(
                   onPressed: () => _editCandidate(index),
                   icon: Icon(Icons.edit_outlined, color: Theme.of(context).iconTheme.color),
                   tooltip: 'Edit Candidate',
                 ),
-                // Delete button (admin only)
-                if (currentUserRole == 'admin')
+                if (widget.isAdmin)
                   IconButton(
                     onPressed: () => _removeCandidate(index),
                     icon: const Icon(Icons.delete_outline, color: Colors.red),
                     tooltip: 'Delete Candidate',
                   ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Tags row (experience, role)
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.green, width: 1),
+                  ),
+                  child: Text(
+                    candidate['experience'],
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontSize: 12,
+                      color: Colors.green,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
+                    ),
+                    child: Text(
+                      candidate['role'],
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
               ],
             ),
             SizedBox(height: 16),
@@ -1158,7 +1120,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('Interview'),
+                      child: const Text('GFI'),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -1249,7 +1211,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                         ),
                       ),
                       child: const Text(
-                        'Interview',
+                        'GFI',
                         style: TextStyle(
                           color: Color(0xFF319582),
                           fontWeight: FontWeight.w500,

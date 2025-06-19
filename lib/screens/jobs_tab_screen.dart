@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../models/job_model.dart';
-import '../../data/user_role.dart';
 import '../data/jobs_data.dart';
 
 // Helper widget for styled text fields in the dialog
@@ -46,7 +45,8 @@ class _StyledTextField extends StatelessWidget {
 
 class JobsTabScreen extends StatefulWidget {
   final VoidCallback onBackToHome;
-  const JobsTabScreen({super.key, required this.onBackToHome});
+  final bool isAdmin;
+  const JobsTabScreen({super.key, required this.onBackToHome, this.isAdmin = false});
 
   @override
   State<JobsTabScreen> createState() => _JobsTabScreenState();
@@ -164,7 +164,7 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
                   ),
                 ),
                 // Post Job (admin only)
-                if (currentUserRole == 'admin')
+                if (widget.isAdmin)
                 Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: SizedBox(

@@ -5,13 +5,15 @@ import 'applications_tab_screen.dart';
 import 'jobs_tab_screen.dart';
 
 class DashboardShellScreen extends StatefulWidget {
-  const DashboardShellScreen({super.key});
+  final bool isAdmin;
+  const DashboardShellScreen({super.key, this.isAdmin = false});
 
   @override
   State<DashboardShellScreen> createState() => _DashboardShellScreenState();
 }
 
 class _DashboardShellScreenState extends State<DashboardShellScreen> {
+  // Access widget.isAdmin for admin features
   int _selectedIndex = 0; // Default to Home tab
 
   void _onItemTapped(int index) {
@@ -24,9 +26,18 @@ class _DashboardShellScreenState extends State<DashboardShellScreen> {
   Widget build(BuildContext context) {
     final List<Widget> widgetOptions = [
       HomeTabScreen(),
-      CandidatesTabScreen(onBackToHome: () => setState(() => _selectedIndex = 0)),
-      JobsTabScreen(onBackToHome: () => setState(() => _selectedIndex = 0)),
-      ApplicationsTabScreen(onBackToHome: () => setState(() => _selectedIndex = 0)),
+      CandidatesTabScreen(
+        onBackToHome: () => setState(() => _selectedIndex = 0),
+        isAdmin: widget.isAdmin,
+      ),
+      JobsTabScreen(
+        onBackToHome: () => setState(() => _selectedIndex = 0),
+        isAdmin: widget.isAdmin,
+        ),
+      ApplicationsTabScreen(
+        onBackToHome: () => setState(() => _selectedIndex = 0),
+        isAdmin: widget.isAdmin,
+        ),
     ];
     return Scaffold(
       body: widgetOptions[_selectedIndex],

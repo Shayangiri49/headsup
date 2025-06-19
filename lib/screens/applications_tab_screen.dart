@@ -3,11 +3,11 @@ import '../services/notification_service.dart';
 import '../data/applications_data.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../data/user_role.dart';
 
 class ApplicationsTabScreen extends StatefulWidget {
   final VoidCallback onBackToHome;
-  const ApplicationsTabScreen({super.key, required this.onBackToHome});
+  final bool isAdmin;
+  const ApplicationsTabScreen({super.key, required this.onBackToHome, this.isAdmin = false});
 
   @override
   State<ApplicationsTabScreen> createState() => _ApplicationsTabScreenState();
@@ -331,7 +331,7 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                 const SizedBox(width: 12),
                 
                 // More options (3-dot menu, admin only)
-                if (currentUserRole == 'admin')
+                if (widget.isAdmin)
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.grey.withOpacity(0.1),

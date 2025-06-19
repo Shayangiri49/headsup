@@ -18,3 +18,5 @@ const Color lightGray = Color(0xFFF7F8FA);  // Light background for cards
 const Color greenAccent = Color(0xFF48BB78);
 const Color cardBackground = Color(0xFFFFFFFF);
 const Color borderColor = Color(0xFFE2E8F0);
+const Color pocketBlue = Color(0xFF007AFF); // Pocket CTS blue
+const Color empowerBlue = Color(0xFF007AFF); // Empower text blue
