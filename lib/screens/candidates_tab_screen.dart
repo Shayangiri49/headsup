@@ -5,6 +5,10 @@ import '../../data/candidates_data.dart' as candidates_data;
 import '../widgets/candidate_popup_form.dart';
 import '../widgets/edit_candidate_popup.dart';
 import '../../data/user_role.dart';
+import 'package:excel/excel.dart' as excel;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class CandidatesTabScreen extends StatefulWidget {
   final VoidCallback onBackToHome;
@@ -24,6 +28,10 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
   String _searchQuery = '';
   bool _isSearching = false;
   List<Map<String, dynamic>> filteredCandidates = [];
+
+  // Selection state for download
+  Set<int> selectedCandidateIndexes = {};
+  bool isSelectingForDownload = false;
 
   // Light button colors
   static const Color lightGreen = Color(0xFFD1EFEA); // Interview
@@ -68,11 +76,16 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
     } else {
       _isSearching = true;
       filteredCandidates = allCandidates.where((candidate) {
-        return candidate['name'].toLowerCase().contains(query.toLowerCase()) ||
-               candidate['role'].toLowerCase().contains(query.toLowerCase()) ||
-               candidate['location'].toLowerCase().contains(query.toLowerCase()) ||
-               candidate['qualification'].toLowerCase().contains(query.toLowerCase()) ||
-               candidate['experience'].toLowerCase().contains(query.toLowerCase());
+        final name = (candidate['name'] ?? '').toString();
+        final role = (candidate['role'] ?? '').toString();
+        final location = (candidate['location'] ?? '').toString();
+        final qualification = (candidate['qualification'] ?? '').toString();
+        final experience = (candidate['experience'] ?? '').toString();
+        return name.toLowerCase().contains(query.toLowerCase()) ||
+               role.toLowerCase().contains(query.toLowerCase()) ||
+               location.toLowerCase().contains(query.toLowerCase()) ||
+               qualification.toLowerCase().contains(query.toLowerCase()) ||
+               experience.toLowerCase().contains(query.toLowerCase());
       }).toList();
     }
   }
@@ -99,7 +112,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
           child: Container(
             width: MediaQuery.of(context).size.width * 0.9,
             padding: const EdgeInsets.all(24),
-            color: Theme.of(context).cardColor,
+            color: const Color(0xFFFFFFFF),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -111,17 +124,17 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            candidate['name'],
+                            (candidate['name'] ?? '').toString(),
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 24, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'ID: ${candidate['id']}',
+                            'ID: ${(candidate['id'] ?? '').toString()}',
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 12, color: Colors.grey[600]),
                           ),
                           SizedBox(height: 4),
                           Text(
-                            candidate['role'],
+                            (candidate['role'] ?? '').toString(),
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 16),
                           ),
                         ],
@@ -151,9 +164,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                     ),
                   ],
                 ),
-                
                 const SizedBox(height: 20),
-                
                 // Rating and View Resume
                 Row(
                   children: [
@@ -161,7 +172,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                     Row(
                       children: [
                         Text(
-                          candidate['rating'].toString(),
+                          (candidate['rating'] ?? '').toString(),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(width: 8),
@@ -181,7 +192,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                                   });
                                 },
                                 child: Icon(
-                                  starIndex < candidate['rating'].floor()
+                                  starIndex < (candidate['rating'] ?? 0).floor()
                                       ? Icons.star
                                       : Icons.star_border,
                                   color: Colors.amber,
@@ -190,7 +201,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                               );
                             } else {
                               return Icon(
-                                starIndex < candidate['rating'].floor()
+                                starIndex < (candidate['rating'] ?? 0).floor()
                                     ? Icons.star
                                     : Icons.star_border,
                                 color: Colors.amber,
@@ -205,7 +216,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                     // View Resume button
                     ElevatedButton(
                       onPressed: () {
-                        print('View Resume for ${candidate['name']}');
+                        print('View Resume for ${(candidate['name'] ?? '').toString()}');
                         // TODO: Implement view resume functionality
                       },
                       style: ElevatedButton.styleFrom(
@@ -224,49 +235,41 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                     ),
                   ],
                 ),
-                
                 const SizedBox(height: 24),
-                
                 // Details grid
                 Row(
                   children: [
                     Expanded(
-                      child: _buildPopupDetailItem('Job Title', candidate['role']),
+                      child: _buildPopupDetailItem('Job Title', (candidate['role'] ?? '').toString()),
                     ),
                     Expanded(
-                      child: _buildPopupDetailItem('Experience', candidate['experience']),
+                      child: _buildPopupDetailItem('Experience', (candidate['experience'] ?? '').toString()),
                     ),
                   ],
                 ),
-                
                 const SizedBox(height: 16),
-                
                 Row(
                   children: [
                     Expanded(
-                      child: _buildPopupDetailItem('Name', candidate['name']),
+                      child: _buildPopupDetailItem('Name', (candidate['name'] ?? '').toString()),
                     ),
                     Expanded(
-                      child: _buildPopupDetailItem('Age', '${candidate['age']}'),
+                      child: _buildPopupDetailItem('Age', (candidate['age'] ?? '').toString()),
                     ),
                   ],
                 ),
-                
                 const SizedBox(height: 16),
-                
                 Row(
                   children: [
                     Expanded(
-                      child: _buildPopupDetailItem('Location', candidate['location']),
+                      child: _buildPopupDetailItem('Location', (candidate['location'] ?? '').toString()),
                     ),
                     Expanded(
-                      child: _buildPopupDetailItem('Qualification', candidate['qualification']),
+                      child: _buildPopupDetailItem('Qualification', (candidate['qualification'] ?? '').toString()),
                     ),
                   ],
                 ),
-                
                 const SizedBox(height: 24),
-                
                 // Notes section (editable)
                 Align(
                   alignment: Alignment.centerLeft,
@@ -287,7 +290,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           decoration: BoxDecoration(
                             color: const Color(0xFFF5F5F5),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                            border: Border.all(color: Colors.grey.withOpacity(0.3)), // BoxDecoration border OK
                           ),
                           child: TextField(
                             controller: notesController,
@@ -331,10 +334,8 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   },
                 ),
                 const SizedBox(height: 24),
-
                 // Action buttons: Only Reschedule for user
                 const SizedBox(height: 24),
-
                 // Close button
                 SizedBox(
                   width: double.infinity,
@@ -382,7 +383,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Text('Remove Candidate'),
-          content: Text('Are you sure you want to remove ${allCandidates[index]['name']} from the candidates list?'),
+          content: Text('Are you sure you want to remove ${(allCandidates[index]['name'] ?? '').toString()} from the candidates list?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
@@ -396,7 +397,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   _filterCandidates(_searchQuery);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('${removedCandidate['name']} has been removed'),
+                      content: Text('${(removedCandidate['name'] ?? '').toString()} has been removed'),
                       backgroundColor: Colors.red,
                       action: SnackBarAction(
                         label: 'Undo',
@@ -425,11 +426,9 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
   // Refresh candidates
   Future<void> _refreshCandidates() async {
     await Future.delayed(const Duration(seconds: 1));
-    
     setState(() {
       filteredCandidates = allCandidates;
     });
-    
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -443,80 +442,78 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
 
   // Show filter dialog
   void _showFilterDialog(BuildContext context) {
-  // Filter controllers
-  TextEditingController ageController = TextEditingController();
-  TextEditingController roleController = TextEditingController();
-  TextEditingController locationController = TextEditingController();
-  showDialog(
-  context: context,
-  builder: (BuildContext context) {
-  return AlertDialog(
-  title: const Text('Filter Candidates'),
-  content: Column(
-  mainAxisSize: MainAxisSize.min,
-  children: [
-  TextField(
-  controller: ageController,
-  keyboardType: TextInputType.number,
-  decoration: const InputDecoration(
-  labelText: 'Age',
-  hintText: 'Enter age',
-  ),
-  ),
-  const SizedBox(height: 12),
-  TextField(
-  controller: roleController,
-  decoration: const InputDecoration(
-  labelText: 'Role',
-  hintText: 'Enter role',
-  ),
-  ),
-  const SizedBox(height: 12),
-  TextField(
-  controller: locationController,
-  decoration: const InputDecoration(
-  labelText: 'Location',
-  hintText: 'Enter location',
-  ),
-  ),
-  ],
-  ),
-  actions: [
-  TextButton(
-  onPressed: () => Navigator.pop(context),
-  child: const Text('Cancel'),
-  ),
-  ElevatedButton(
-  onPressed: () {
-  // Apply filters
-  String age = ageController.text.trim();
-  String role = roleController.text.trim().toLowerCase();
-  String location = locationController.text.trim().toLowerCase();
-  setState(() {
-  filteredCandidates = allCandidates.where((candidate) {
-  bool matches = true;
-  if (age.isNotEmpty) {
-  matches = matches && candidate['age'].toString() == age;
-  }
-  if (role.isNotEmpty) {
-  matches = matches && candidate['role'].toLowerCase().contains(role);
-  }
-  if (location.isNotEmpty) {
-  matches = matches && candidate['location'].toLowerCase().contains(location);
-  }
-  return matches;
-  }).toList();
-  _isSearching = true;
-  _searchQuery = '';
-  });
-  Navigator.pop(context);
-  },
-  child: const Text('Apply Filters'),
-  ),
-  ],
-  );
-  },
-  );
+    TextEditingController ageController = TextEditingController();
+    TextEditingController roleController = TextEditingController();
+    TextEditingController locationController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Filter Candidates'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: ageController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Age',
+                  hintText: 'Enter age',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: roleController,
+                decoration: const InputDecoration(
+                  labelText: 'Role',
+                  hintText: 'Enter role',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: locationController,
+                decoration: const InputDecoration(
+                  labelText: 'Location',
+                  hintText: 'Enter location',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                String age = ageController.text.trim();
+                String role = roleController.text.trim().toLowerCase();
+                String location = locationController.text.trim().toLowerCase();
+                setState(() {
+                  filteredCandidates = allCandidates.where((candidate) {
+                    bool matches = true;
+                    if (age.isNotEmpty) {
+                      matches = matches && (candidate['age'] ?? '').toString() == age;
+                    }
+                    if (role.isNotEmpty) {
+                      matches = matches && (candidate['role'] ?? '').toString().toLowerCase().contains(role);
+                    }
+                    if (location.isNotEmpty) {
+                      matches = matches && (candidate['location'] ?? '').toString().toLowerCase().contains(location);
+                    }
+                    return matches;
+                  }).toList();
+                  _isSearching = true;
+                  _searchQuery = '';
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('Apply Filters'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Add new candidate
@@ -543,7 +540,6 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
               onBookInterview: (candidateData) {
                 Navigator.pop(context);
                 setState(() {
-                  // Always assign a unique id to a new candidate
                   final newCandidate = Map<String, dynamic>.from(candidateData);
                   newCandidate['id'] = DateTime.now().millisecondsSinceEpoch;
                   if (!newCandidate.containsKey('interviewTime') || newCandidate['interviewTime'] == null) {
@@ -593,8 +589,6 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
     );
   }
 
-  // QuickActionsHeaderDelegate class for the persistent header (removed duplicate definition from inside CandidatesTabScreen)
-
   // Go for interview
   void _goForInterview(int index) {
     showDialog(
@@ -602,7 +596,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirm GFI Selection'),
-          content: Text('Mark ${allCandidates[index]['name']} as selected for GFI?'),
+          content: Text('Mark ${(allCandidates[index]['name'] ?? '').toString()} as selected for GFI?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -616,13 +610,13 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                 });
                 _notificationService.addNotification(
                   title: 'Interview Scheduled',
-                  message: 'Interview scheduled with ${allCandidates[index]['name']}',
+                  message: 'Interview scheduled with ${(allCandidates[index]['name'] ?? '').toString()}',
                   type: NotificationType.interview,
-                  candidateName: allCandidates[index]['name'],
+                  candidateName: (allCandidates[index]['name'] ?? '').toString(),
                 );
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Interview scheduled with ${allCandidates[index]['name']}'),
+                    content: Text('Interview scheduled with ${(allCandidates[index]['name'] ?? '').toString()}'),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -642,7 +636,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Reschedule Interview'),
-          content: Text('Reschedule interview with ${allCandidates[index]['name']}?'),
+          content: Text('Reschedule interview with ${(allCandidates[index]['name'] ?? '').toString()}?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -653,14 +647,13 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                 Navigator.pop(context);
                 _notificationService.addNotification(
                 title: 'Interview Rescheduled',
-                message: 'Interview rescheduled with ${allCandidates[index]['name']}',
+                message: 'Interview rescheduled with ${(allCandidates[index]['name'] ?? '').toString()}',
                 type: NotificationType.reschedule,
-                candidateName: allCandidates[index]['name'],
+                candidateName: (allCandidates[index]['name'] ?? '').toString(),
                 );
-                
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Interview rescheduled with ${allCandidates[index]['name']}'),
+                    content: Text('Interview rescheduled with ${(allCandidates[index]['name'] ?? '').toString()}'),
                     backgroundColor: Colors.orange,
                   ),
                 );
@@ -680,7 +673,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Mark as Reached'),
-          content: Text('Mark ${allCandidates[index]['name']} as reached?'),
+          content: Text('Mark ${(allCandidates[index]['name'] ?? '').toString()} as reached?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -694,13 +687,13 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                 });
                 _notificationService.addNotification(
                   title: 'Candidate Reached',
-                  message: '${allCandidates[index]['name']} marked as reached',
+                  message: '${(allCandidates[index]['name'] ?? '').toString()} marked as reached',
                   type: NotificationType.reached,
-                  candidateName: allCandidates[index]['name'],
+                  candidateName: (allCandidates[index]['name'] ?? '').toString(),
                 );
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('${allCandidates[index]['name']} marked as reached'),
+                    content: Text('${(allCandidates[index]['name'] ?? '').toString()} marked as reached'),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -735,23 +728,29 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
           ? null
           : Row(
             children: [
-            Text('Candidates List', style: Theme.of(context).appBarTheme.titleTextStyle),
-            SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              Expanded(
+                child: Text(
+                  'Candidates List',
+                  style: Theme.of(context).appBarTheme.titleTextStyle,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              child: Text(
-              '${filteredCandidates.length}',
-              style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.bold,
+              SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${filteredCandidates.length}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              ),
-            ),
             ],
           ),
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
@@ -759,16 +758,61 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
         actions: [
         if (!_isSearching) ...[
           IconButton(
-          icon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
-          onPressed: () {
-            setState(() {
-            _isSearching = true;
-            });
-          },
+            icon: Icon(Icons.search, color: Theme.of(context).iconTheme.color),
+            onPressed: () {
+              setState(() {
+                _isSearching = true;
+              });
+            },
           ),
+          if (widget.isAdmin) ...[
+            IconButton(
+              icon: Icon(Icons.download, color: Theme.of(context).iconTheme.color),
+              tooltip: 'Download',
+              onPressed: () async {
+                if (isSelectingForDownload && selectedCandidateIndexes.isNotEmpty) {
+                await _downloadSelectedCandidates();
+                setState(() {
+                isSelectingForDownload = false;
+                selectedCandidateIndexes.clear();
+                });
+                } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                content: Text('Press and hold a candidate name to select candidates for download.'),
+                backgroundColor: Colors.orange,
+                ),
+                );
+                }
+              },
+            ),
+            if (isSelectingForDownload)
+              IconButton(
+                icon: Icon(
+                  selectedCandidateIndexes.length == filteredCandidates.length && filteredCandidates.isNotEmpty
+                    ? Icons.check_box
+                    : Icons.check_box_outline_blank,
+                  color: Theme.of(context).iconTheme.color,
+                ),
+                tooltip: selectedCandidateIndexes.length == filteredCandidates.length && filteredCandidates.isNotEmpty
+                  ? 'Deselect All'
+                  : 'Select All',
+                onPressed: () {
+                  setState(() {
+                    if (selectedCandidateIndexes.length == filteredCandidates.length && filteredCandidates.isNotEmpty) {
+                      selectedCandidateIndexes.clear();
+                    } else {
+                      selectedCandidateIndexes = filteredCandidates
+                        .map((c) => allCandidates.indexOf(c))
+                        .toSet();
+                    }
+                  });
+                },
+              ),
+          ],
           IconButton(
-          icon: Icon(Icons.filter_list, color: Theme.of(context).iconTheme.color),
-          onPressed: () => _showFilterDialog(context),
+            icon: Icon(Icons.filter_list, color: Theme.of(context).iconTheme.color),
+            onPressed: () => _showFilterDialog(context),
           ),
         ] else ...[
           IconButton(
@@ -812,6 +856,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
         child: CustomScrollView(
         controller: _scrollController,
         slivers: [
+          // Download button row removed from body
           // Search results header
           if (_isSearching) ...[
           SliverToBoxAdapter(
@@ -842,9 +887,6 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
             ),
           ),
           ],
-
-          // Quick actions header removed
-
           // Candidates list
           if (filteredCandidates.isEmpty && _isSearching) ...[
           SliverFillRemaining(
@@ -903,7 +945,6 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
             ),
             ),
           ),
-
           // End of list indicator
           if (!_isSearching)
             SliverToBoxAdapter(
@@ -924,15 +965,12 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
         ],
         ),
       ),
-
-      // Floating Action Button removed as per requirements
       floatingActionButton: null,
       ),
     );
   }
 
   Widget _buildCandidateCard(Map<String, dynamic> candidate, int index) {
-    // Highlight search terms in candidate name
     Widget buildHighlightedText(String text, String query) {
       if (query.isEmpty) {
         return GestureDetector(
@@ -1003,9 +1041,43 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                if (widget.isAdmin && isSelectingForDownload)
+                  Checkbox(
+                    value: selectedCandidateIndexes.contains(index),
+                    onChanged: (checked) {
+                      setState(() {
+                        if (checked == true) {
+                          selectedCandidateIndexes.add(index);
+                        } else {
+                          selectedCandidateIndexes.remove(index);
+                        }
+                      });
+                    },
+                  ),
                 // Candidate name
                 Expanded(
-                  child: buildHighlightedText(candidate['name'], _searchQuery),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onLongPress: () {
+                      if (widget.isAdmin && !isSelectingForDownload) {
+                        setState(() {
+                          isSelectingForDownload = true;
+                          selectedCandidateIndexes.add(index);
+                        });
+                      }
+                    },
+                    onTap: () => _showCandidateDetails(candidate, index),
+                    child: AbsorbPointer(
+                      child: Text(
+                        (candidate['name'] ?? '').toString(),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF000000),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
                 IconButton(
                   onPressed: () => _editCandidate(index),
@@ -1029,10 +1101,10 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   decoration: BoxDecoration(
                     color: Colors.green.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.green, width: 1),
+                    border: Border.all(color: Colors.green, width: 1), // BoxDecoration border OK
                   ),
                   child: Text(
-                    candidate['experience'],
+                    (candidate['experience'] ?? '').toString(),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontSize: 12,
                       color: Colors.green,
@@ -1045,15 +1117,15 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      color: Colors.green.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
+                      border: Border.all(color: Colors.green, width: 1), // BoxDecoration border OK
                     ),
                     child: Text(
-                      candidate['role'],
+                      (candidate['role'] ?? '').toString(),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 12,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Colors.green,
                         fontWeight: FontWeight.w500,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -1070,11 +1142,11 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildDetailRow(Icons.location_on_outlined, candidate['location']),
+                      _buildDetailRow(Icons.location_on_outlined, (candidate['location'] ?? '').toString()),
                       SizedBox(height: 8),
-                      _buildDetailRow(Icons.school_outlined, candidate['qualification']),
+                      _buildDetailRow(Icons.school_outlined, (candidate['qualification'] ?? '').toString()),
                       SizedBox(height: 8),
-                      _buildDetailRow(Icons.calendar_today_outlined, 'Added: ${candidate['addedDate']}'),
+                      _buildDetailRow(Icons.calendar_today_outlined, 'Added: ${(candidate['addedDate'] ?? '').toString()}'),
                     ],
                   ),
                 ),
@@ -1086,7 +1158,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                         Icon(Icons.star, color: Colors.amber, size: 20),
                         SizedBox(width: 4),
                         Text(
-                          candidate['rating'].toString(),
+                          (candidate['rating'] ?? '').toString(),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -1138,13 +1210,13 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                                   maxHeight: MediaQuery.of(context).size.height * 0.9,
                                 ),
                                 child: CandidatePopupForm(
-                                  initialPhone: candidate['phone'] ?? '',
-                                  initialName: candidate['name'],
-                                  initialRole: candidate['role'],
-                                  initialLocation: candidate['location'],
-                                  initialQualification: candidate['qualification'],
-                                  initialExperience: candidate['experience'],
-                                  initialInterviewTime: candidate['interviewTime'],
+                                  initialPhone: (candidate['phone'] ?? '').toString(),
+                                  initialName: (candidate['name'] ?? '').toString(),
+                                  initialRole: (candidate['role'] ?? '').toString(),
+                                  initialLocation: (candidate['location'] ?? '').toString(),
+                                  initialQualification: (candidate['qualification'] ?? '').toString(),
+                                  initialExperience: (candidate['experience'] ?? '').toString(),
+                                  initialInterviewTime: (candidate['interviewTime'] ?? '').toString(),
                                   onlyEditTime: true,
                                   onBookInterview: (candidateData) {
                                     Navigator.pop(dialogContext);
@@ -1153,13 +1225,13 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                                     });
                                     _notificationService.addNotification(
                                       title: 'Interview Rescheduled',
-                                      message: 'Interview rescheduled with ${candidate['name']}',
+                                      message: 'Interview rescheduled with ${(candidate['name'] ?? '').toString()}',
                                       type: NotificationType.reschedule,
-                                      candidateName: candidate['name'],
+                                      candidateName: (candidate['name'] ?? '').toString(),
                                     );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Interview rescheduled with ${candidate['name']}'),
+                                        content: Text('Interview rescheduled with ${(candidate['name'] ?? '').toString()}'),
                                         backgroundColor: Colors.orange,
                                       ),
                                     );
@@ -1234,13 +1306,13 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                                   maxHeight: MediaQuery.of(context).size.height * 0.9,
                                 ),
                                 child: CandidatePopupForm(
-                                  initialPhone: candidate['phone'] ?? '',
-                                  initialName: candidate['name'],
-                                  initialRole: candidate['role'],
-                                  initialLocation: candidate['location'],
-                                  initialQualification: candidate['qualification'],
-                                  initialExperience: candidate['experience'],
-                                  initialInterviewTime: candidate['interviewTime'],
+                                  initialPhone: (candidate['phone'] ?? '').toString(),
+                                  initialName: (candidate['name'] ?? '').toString(),
+                                  initialRole: (candidate['role'] ?? '').toString(),
+                                  initialLocation: (candidate['location'] ?? '').toString(),
+                                  initialQualification: (candidate['qualification'] ?? '').toString(),
+                                  initialExperience: (candidate['experience'] ?? '').toString(),
+                                  initialInterviewTime: (candidate['interviewTime'] ?? '').toString(),
                                   onlyEditTime: true,
                                   onBookInterview: (candidateData) {
                                     Navigator.pop(dialogContext);
@@ -1249,13 +1321,13 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                                     });
                                     _notificationService.addNotification(
                                       title: 'Interview Rescheduled',
-                                      message: 'Interview rescheduled with ${candidate['name']}',
+                                      message: 'Interview rescheduled with ${(candidate['name'] ?? '').toString()}',
                                       type: NotificationType.reschedule,
-                                      candidateName: candidate['name'],
+                                      candidateName: (candidate['name'] ?? '').toString(),
                                     );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Interview rescheduled with ${candidate['name']}'),
+                                        content: Text('Interview rescheduled with ${(candidate['name'] ?? '').toString()}'),
                                         backgroundColor: Colors.orange,
                                       ),
                                     );
@@ -1335,6 +1407,50 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
       ],
     );
   }
-}
 
-// QuickActionsHeaderDelegate removed
+  // Download logic (mobile/desktop only)
+  Future<void> _downloadSelectedCandidates() async {
+    List<Map<String, dynamic>> candidatesToExport;
+    if (selectedCandidateIndexes.isEmpty) {
+      candidatesToExport = List<Map<String, dynamic>>.from(allCandidates);
+    } else {
+      candidatesToExport = selectedCandidateIndexes.map((i) => allCandidates[i]).toList();
+    }
+    if (candidatesToExport.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No candidates to export'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+    var excelFile = excel.Excel.createExcel();
+    var sheetObject = excelFile['Candidates'];
+    // Header
+    sheetObject.appendRow([
+      'ID', 'Name', 'Role', 'Experience', 'Location', 'Qualification', 'Age', 'Rating', 'Added Date', 'Notes', 'Interview Time', 'Status'
+    ]);
+    for (var c in candidatesToExport) {
+      sheetObject.appendRow([
+        c['id'] ?? '',
+        c['name'] ?? '',
+        c['role'] ?? '',
+        c['experience'] ?? '',
+        c['location'] ?? '',
+        c['qualification'] ?? '',
+        c['age'] ?? '',
+        c['rating'] ?? '',
+        c['addedDate'] ?? '',
+        c['notes'] ?? '',
+        c['interviewTime'] ?? '',
+        c['status'] ?? '',
+      ]);
+    }
+    final fileBytes = excelFile.encode();
+    final fileName = 'candidates_export_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/$fileName');
+    await file.writeAsBytes(fileBytes!);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Excel file saved: ${file.path}'), backgroundColor: Colors.green),
+    );
+  }
+}

@@ -234,7 +234,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                             child: ElevatedButton(
                               onPressed: _addCandidate,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF4A90E2),
+                                backgroundColor: const Color(0xFF0A7FF1),
                                 foregroundColor: Colors.white,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
@@ -423,13 +423,40 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Performance Report',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Performance Report',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+                ),
+              ),
+              if (currentUserRole == 'admin')
+                IconButton(
+                  icon: const Icon(Icons.edit, color: Color(0xFF0A7FF1)),
+                  tooltip: 'Edit Performance Report',
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Edit Performance Report'),
+                          content: const Text('Admin editing functionality goes here.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Close'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+            ],
           ),
           const SizedBox(height: 20),
           
@@ -445,7 +472,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF4CAF50),
+                        color: Color(0xFF27DF5B),
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20),
                           topRight: Radius.circular(20),
@@ -465,7 +492,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF2196F3),
+                        color: Color(0xFF0A7FF1),
                       ),
                       child: const Center(
                         child: Text(
@@ -481,7 +508,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF2196F3),
+                        color: Color(0xFF0A7FF1),
                       ),
                       child: const Center(
                         child: Text(
@@ -497,7 +524,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF2196F3),
+                        color: Color(0xFF0A7FF1),
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(20),
                           bottomRight: Radius.circular(20),
@@ -525,7 +552,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF4CAF50),
+                        color: Color(0xFF27DF5B),
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20),
                           topRight: Radius.circular(20),
@@ -545,7 +572,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF2196F3),
+                        color: Color(0xFF0A7FF1),
                       ),
                       child: const Center(
                         child: Text(
@@ -561,7 +588,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF2196F3),
+                        color: Color(0xFF0A7FF1),
                       ),
                       child: const Center(
                         child: Text(
@@ -577,7 +604,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF2196F3),
+                        color: Color(0xFF0A7FF1),
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(20),
                           bottomRight: Radius.circular(20),
@@ -605,7 +632,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF4CAF50),
+                        color: Color(0xFF27DF5B),
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20),
                           topRight: Radius.circular(20),
@@ -625,7 +652,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF2196F3),
+                        color: Color(0xFF0A7FF1),
                       ),
                       child: const Center(
                         child: Text(
@@ -641,7 +668,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF2196F3),
+                        color: Color(0xFF0A7FF1),
                       ),
                       child: const Center(
                         child: Text(
@@ -657,7 +684,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: const BoxDecoration(
-                        color: Color(0xFF2196F3),
+                        color: Color(0xFF0A7FF1),
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(20),
                           bottomRight: Radius.circular(20),
@@ -719,31 +746,104 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                   showDialog(
                     context: context,
                     builder: (context) {
-                      return AlertDialog(
-                        title: const Text('GFI Selected Candidates'),
-                        content: gfiCandidates.isEmpty
-                            ? const Text('No candidates selected for GFI.')
-                            : SizedBox(
-                                width: 300,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: gfiCandidates.length,
-                                  itemBuilder: (context, idx) {
-                                    final candidate = gfiCandidates[idx];
-                                    return ListTile(
-                                      title: Text(candidate['name'] ?? ''),
-                                      subtitle: Text(candidate['role'] ?? ''),
-                                      trailing: Text('ID: ${candidate['id'] ?? ''}'),
-                                    );
-                                  },
+                      return Dialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        backgroundColor: Theme.of(context).cardColor,
+                        child: Container(
+                          width: 350,
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.group, color: Color(0xFF0A7FF1)),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'GFI Selected Candidates',
+                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              gfiCandidates.isEmpty
+                                  ? const Text('No candidates selected for GFI.', style: TextStyle(fontSize: 16))
+                                  : SizedBox(
+                                      height: 250,
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: gfiCandidates.length,
+                                        itemBuilder: (context, idx) {
+                                          final candidate = gfiCandidates[idx];
+                                          return Card(
+                                            margin: const EdgeInsets.symmetric(vertical: 6),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                            child: ListTile(
+                                              leading: CircleAvatar(
+                                                backgroundColor: const Color(0xFF0A7FF1).withOpacity(0.1),
+                                                child: Text(
+                                                  (candidate['name'] ?? '').toString().isNotEmpty
+                                                      ? (candidate['name'] ?? '').toString()[0].toUpperCase()
+                                                      : '',
+                                                  style: const TextStyle(color: Color(0xFF0A7FF1)),
+                                                ),
+                                              ),
+                                              title: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          candidate['name'] ?? '',
+                                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      Text(
+                                                        'ID: ${candidate['id'] ?? ''}',
+                                                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    candidate['role'] ?? '',
+                                                    style: TextStyle(fontWeight: FontWeight.normal, color: Colors.grey[700], fontSize: 13),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                              const SizedBox(height: 24),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF0A7FF1),
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                  ),
+                                  child: const Text('Close', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                 ),
                               ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Close'),
+                            ],
                           ),
-                        ],
+                        ),
                       );
                     },
                   );
@@ -751,7 +851,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF007AFF),
+                    color: const Color(0xFF0085FF),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -821,31 +921,104 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                   showDialog(
                     context: context,
                     builder: (context) {
-                      return AlertDialog(
-                        title: const Text('Reached Candidates'),
-                        content: reachedCandidates.isEmpty
-                            ? const Text('No candidates marked as reached.')
-                            : SizedBox(
-                                width: 300,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: reachedCandidates.length,
-                                  itemBuilder: (context, idx) {
-                                    final candidate = reachedCandidates[idx];
-                                    return ListTile(
-                                      title: Text(candidate['name'] ?? ''),
-                                      subtitle: Text(candidate['role'] ?? ''),
-                                      trailing: Text('ID: ${candidate['id'] ?? ''}'),
-                                    );
-                                  },
+                      return Dialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        backgroundColor: Theme.of(context).cardColor,
+                        child: Container(
+                          width: 350,
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.verified, color: Colors.green),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'Reached Candidates',
+                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              reachedCandidates.isEmpty
+                                  ? const Text('No candidates marked as reached.', style: TextStyle(fontSize: 16))
+                                  : SizedBox(
+                                      height: 250,
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: reachedCandidates.length,
+                                        itemBuilder: (context, idx) {
+                                          final candidate = reachedCandidates[idx];
+                                          return Card(
+                                            margin: const EdgeInsets.symmetric(vertical: 6),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                            child: ListTile(
+                                              leading: CircleAvatar(
+                                                backgroundColor: Colors.green.withOpacity(0.1),
+                                                child: Text(
+                                                  (candidate['name'] ?? '').toString().isNotEmpty
+                                                      ? (candidate['name'] ?? '').toString()[0].toUpperCase()
+                                                      : '',
+                                                  style: const TextStyle(color: Colors.green),
+                                                ),
+                                              ),
+                                              title: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          candidate['name'] ?? '',
+                                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      Text(
+                                                        'ID: ${candidate['id'] ?? ''}',
+                                                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    candidate['role'] ?? '',
+                                                    style: TextStyle(fontWeight: FontWeight.normal, color: Colors.grey[700], fontSize: 13),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                              const SizedBox(height: 24),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                  ),
+                                  child: const Text('Close', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                 ),
                               ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Close'),
+                            ],
                           ),
-                        ],
+                        ),
                       );
                     },
                   );

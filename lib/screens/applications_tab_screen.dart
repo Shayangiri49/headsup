@@ -43,6 +43,10 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
     }).toList();
   }
 
+  // Selection state for download
+  Set<int> selectedApplicationIndexes = {};
+  bool isSelectingForDownload = false;
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -62,28 +66,71 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       elevation: 1,
       actions: [
-      // Filter dropdown
-      PopupMenuButton<String>(
-      icon: Icon(Icons.filter_list, color: Theme.of(context).iconTheme.color),
-      onSelected: (String value) {
-      setState(() {
-      selectedFilter = value;
-      });
-      },
-      itemBuilder: (BuildContext context) => filterOptions.map((String choice) {
-      return PopupMenuItem<String>(
-      value: choice,
-      child: Row(
-      children: [
-      if (selectedFilter == choice)
-      Icon(Icons.check, color: Theme.of(context).colorScheme.primary, size: 20),
-      if (selectedFilter == choice) const SizedBox(width: 8),
-      Text(choice),
-      ],
-      ),
-      );
-      }).toList(),
-      ),
+        IconButton(
+          icon: Icon(Icons.download, color: Theme.of(context).iconTheme.color),
+          tooltip: 'Download',
+          onPressed: () async {
+            if (isSelectingForDownload && selectedApplicationIndexes.isNotEmpty) {
+              await _downloadSelectedApplications();
+              setState(() {
+                isSelectingForDownload = false;
+                selectedApplicationIndexes.clear();
+              });
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Press and hold an application to select applications for download.'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            }
+          },
+        ),
+        if (isSelectingForDownload)
+          IconButton(
+            icon: Icon(
+              selectedApplicationIndexes.length == filteredApplications.length && filteredApplications.isNotEmpty
+                ? Icons.check_box
+                : Icons.check_box_outline_blank,
+              color: Theme.of(context).iconTheme.color,
+            ),
+            tooltip: selectedApplicationIndexes.length == filteredApplications.length && filteredApplications.isNotEmpty
+              ? 'Deselect All'
+              : 'Select All',
+            onPressed: () {
+              setState(() {
+                if (selectedApplicationIndexes.length == filteredApplications.length && filteredApplications.isNotEmpty) {
+                  selectedApplicationIndexes.clear();
+                } else {
+                  selectedApplicationIndexes = filteredApplications
+                    .map((c) => applications.indexOf(c))
+                    .toSet();
+                }
+              });
+            },
+          ),
+        // Filter dropdown
+        PopupMenuButton<String>(
+          icon: Icon(Icons.filter_list, color: Theme.of(context).iconTheme.color),
+          onSelected: (String value) {
+            setState(() {
+              selectedFilter = value;
+            });
+          },
+          itemBuilder: (BuildContext context) => filterOptions.map((String choice) {
+            return PopupMenuItem<String>(
+              value: choice,
+              child: Row(
+                children: [
+                  if (selectedFilter == choice)
+                    Icon(Icons.check, color: Theme.of(context).colorScheme.primary, size: 20),
+                  if (selectedFilter == choice) const SizedBox(width: 8),
+                  Text(choice),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
       ],
       ),
       body: Column(
@@ -124,7 +171,6 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
             ],
           ),
           ),
-        
         // Applications list
         Expanded(
           child: filteredApplications.isEmpty
@@ -161,7 +207,8 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
               padding: const EdgeInsets.all(16),
               itemCount: filteredApplications.length,
               itemBuilder: (context, index) {
-              return _buildApplicationCard(filteredApplications[index], index);
+                final appIndex = applications.indexOf(filteredApplications[index]);
+                return _buildApplicationCard(filteredApplications[index], appIndex);
               },
             ),
         ),
@@ -170,6 +217,7 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
       ),
     );
   }
+
   Widget _buildApplicationCard(Map<String, dynamic> application, int index) {
     Color getStatusColor(String status) {
       switch (status) {
@@ -183,8 +231,6 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
           return Colors.orange;
       }
     }
-    
-
     String getStatusText(String status) {
       switch (status) {
         case 'selected':
@@ -197,7 +243,6 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
           return 'Pending';
       }
     }
-
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
@@ -217,30 +262,56 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
             // Header with company info and avatar
             Row(
               children: [
+                if (isSelectingForDownload)
+                  Checkbox(
+                    value: selectedApplicationIndexes.contains(index),
+                    onChanged: (checked) {
+                      setState(() {
+                        if (checked == true) {
+                          selectedApplicationIndexes.add(index);
+                        } else {
+                          selectedApplicationIndexes.remove(index);
+                        }
+                      });
+                    },
+                  ),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        application['company'],
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onLongPress: () {
+                      if (!isSelectingForDownload) {
+                        setState(() {
+                          isSelectingForDownload = true;
+                          selectedApplicationIndexes.add(index);
+                        });
+                      }
+                    },
+                    child: AbsorbPointer(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            application['company'],
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            application['position'],
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            application['candidateName'],
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            application['appliedDate'],
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        application['position'],
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        application['candidateName'],
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        application['appliedDate'],
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 // Avatar
@@ -260,9 +331,7 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                 ),
               ],
             ),
-            
             const SizedBox(height: 16),
-            
             // Status badge
             Row(
               children: [
@@ -288,9 +357,7 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                 const Spacer(),
               ],
             ),
-            
             const SizedBox(height: 16),
-            
             // Action buttons
             Row(
               children: [
@@ -298,11 +365,11 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () => _openWhatsApp(application['whatsapp']),
-                    icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 18),
+                    icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 18, color: Color(0xFF319582)),
                     label: const Text(''),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF25D366), // WhatsApp green
-                      foregroundColor: Colors.white,
+                      backgroundColor: const Color(0xFFD1EFEA),
+                      foregroundColor: Color(0xFF319582),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -311,16 +378,15 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                
                 // Phone button
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () => _makePhoneCall(application['phone']),
-                    icon: const Icon(Icons.phone, size: 18),
+                    icon: const Icon(Icons.phone, size: 18, color: Color(0xFF414789)),
                     label: const Text(''),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2196F3), // Blue
-                      foregroundColor: Colors.white,
+                      backgroundColor: const Color(0xFFFBE9B7),
+                      foregroundColor: Color(0xFF414789),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -329,63 +395,60 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                
                 // More options (3-dot menu, admin only)
                 if (widget.isAdmin)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.1),
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.more_vert, color: Color(0xFF726E02)),
+                    onSelected: (String value) {
+                      _handleStatusChange(application, value, index);
+                    },
+                    itemBuilder: (BuildContext context) => [
+                      PopupMenuItem<String>(
+                        value: 'selected',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle_outline,
+                              color: Colors.blue,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('Selected'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'rejected',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.cancel_outlined,
+                              color: Colors.red,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('Rejected'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        value: 'joined',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.person_add_outlined,
+                              color: Colors.green,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('Joined'),
+                          ],
+                        ),
+                      ),
+                    ],
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: PopupMenuButton<String>(
-                      icon: Icon(Icons.more_vert, color: Theme.of(context).iconTheme.color),
-                      onSelected: (String value) {
-                        _handleStatusChange(application, value, index);
-                      },
-                      itemBuilder: (BuildContext context) => [
-                        PopupMenuItem<String>(
-                          value: 'selected',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.check_circle_outline,
-                                color: Colors.blue,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              const Text('Selected'),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'rejected',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.cancel_outlined,
-                                color: Colors.red,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              const Text('Rejected'),
-                            ],
-                          ),
-                        ),
-                        PopupMenuItem<String>(
-                          value: 'joined',
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.person_add_outlined,
-                                color: Colors.green,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              const Text('Joined'),
-                            ],
-                          ),
-                        ),
-                      ],
                     ),
                   ),
               ],
@@ -519,5 +582,20 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
       default:
         return Colors.orange;
     }
+  }
+
+  // Placeholder for download logic
+  Future<void> _downloadSelectedApplications() async {
+    // You can implement Excel or CSV export here, similar to candidates_tab_screen.dart
+    // For now, just show a message
+    if (selectedApplicationIndexes.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No applications selected for download'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Downloaded ${selectedApplicationIndexes.length} applications'), backgroundColor: Colors.green),
+    );
   }
 }

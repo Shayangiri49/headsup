@@ -561,37 +561,93 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
                               Wrap(
                                 spacing: 8,
                                 runSpacing: 8,
-                                children: localities.map((locality) {
-                                  final isSelected = selectedLocality == locality;
-                                  return GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selectedLocality = locality;
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isSelected ? primaryBlue : Colors.blue.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                          color: isSelected ? primaryBlue : Colors.blue.withOpacity(0.3),
+                                children: [
+                                  ...localities.take(3).map((locality) {
+                                    final isSelected = selectedLocality == locality;
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedLocality = locality;
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: isSelected ? primaryBlue : Colors.blue.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(20),
+                                          border: Border.all(
+                                            color: isSelected ? primaryBlue : Colors.blue.withOpacity(0.3),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          locality,
+                                          style: TextStyle(
+                                            color: isSelected ? Colors.white : primaryBlue,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                          ),
                                         ),
                                       ),
-                                      child: Text(
-                                        locality,
-                                        style: TextStyle(
-                                          color: isSelected ? Colors.white : primaryBlue,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14,
+                                    );
+                                  }),
+                                  if (localities.length > 3)
+                                    GestureDetector(
+                                      onTap: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: const Text('All Locations'),
+                                              content: SizedBox(
+                                                width: double.maxFinite,
+                                                child: ListView(
+                                                  shrinkWrap: true,
+                                                  children: localities.map((locality) {
+                                                    final isSelected = selectedLocality == locality;
+                                                    return ListTile(
+                                                      title: Text(locality),
+                                                      trailing: isSelected ? const Icon(Icons.check, color: primaryBlue) : null,
+                                                      onTap: () {
+                                                        setState(() {
+                                                          selectedLocality = locality;
+                                                        });
+                                                        Navigator.pop(context);
+                                                      },
+                                                    );
+                                                  }).toList(),
+                                                ),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () => Navigator.pop(context),
+                                                  child: const Text('Close'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(20),
+                                          border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                                        ),
+                                        child: const Text(
+                                          'View More',
+                                          style: TextStyle(
+                                            color: primaryBlue,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  );
-                                }).toList(),
+                                ],
                               ),
                               if (_showSelectionErrors && selectedLocality == null)
                                 const Padding(
@@ -613,37 +669,93 @@ class _CandidatePopupFormState extends State<CandidatePopupForm> {
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: jobCategories.map((category) {
-                            final isSelected = selectedJobCategory == category;
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  selectedJobCategory = category;
-                                });
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isSelected ? Colors.green : Colors.green.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: isSelected ? Colors.green : Colors.green.withOpacity(0.3),
+                          children: [
+                            ...jobCategories.take(3).map((category) {
+                              final isSelected = selectedJobCategory == category;
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedJobCategory = category;
+                                  });
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? Colors.green : Colors.green.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: isSelected ? Colors.green : Colors.green.withOpacity(0.3),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    category,
+                                    style: TextStyle(
+                                      color: isSelected ? Colors.white : Colors.green,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ),
-                                child: Text(
-                                  category,
-                                  style: TextStyle(
-                                    color: isSelected ? Colors.white : Colors.green,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14,
+                              );
+                            }),
+                            if (jobCategories.length > 3)
+                              GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text('All Job Roles'),
+                                        content: SizedBox(
+                                          width: double.maxFinite,
+                                          child: ListView(
+                                            shrinkWrap: true,
+                                            children: jobCategories.map((category) {
+                                              final isSelected = selectedJobCategory == category;
+                                              return ListTile(
+                                                title: Text(category),
+                                                trailing: isSelected ? const Icon(Icons.check, color: Colors.green) : null,
+                                                onTap: () {
+                                                  setState(() {
+                                                    selectedJobCategory = category;
+                                                  });
+                                                  Navigator.pop(context);
+                                                },
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            child: const Text('Close'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: Colors.green.withOpacity(0.3)),
+                                  ),
+                                  child: const Text(
+                                    'View More',
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ),
                               ),
-                            );
-                          }).toList(),
+                          ],
                         ),
                         if (_showSelectionErrors && selectedJobCategory == null)
                           const Padding(

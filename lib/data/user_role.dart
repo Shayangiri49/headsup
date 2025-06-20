@@ -1,1 +1,1 @@
-String currentUserRole = 'user'; // or 'admin'
+String currentUserRole = 'admin'; // or 'user'

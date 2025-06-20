@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../models/job_model.dart';
 import '../data/jobs_data.dart';
+import 'package:share_plus/share_plus.dart';
 
 // Helper widget for styled text fields in the dialog
 class _StyledTextField extends StatelessWidget {
@@ -73,6 +74,10 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
     return jobs.where((job) => job.type == selectedFilter).toList();
   }
 
+  // Selection state for download
+  Set<int> selectedJobIndexes = {};
+  bool isSelectingForDownload = false;
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -91,6 +96,49 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           elevation: 1,
           actions: [
+            IconButton(
+              icon: Icon(Icons.download, color: Theme.of(context).iconTheme.color),
+              tooltip: 'Download',
+              onPressed: () async {
+                if (isSelectingForDownload && selectedJobIndexes.isNotEmpty) {
+                  await _downloadSelectedJobs();
+                  setState(() {
+                    isSelectingForDownload = false;
+                    selectedJobIndexes.clear();
+                  });
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Press and hold a job card to select jobs for download.'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                }
+              },
+            ),
+            if (isSelectingForDownload)
+              IconButton(
+                icon: Icon(
+                  selectedJobIndexes.length == filteredJobs.length && filteredJobs.isNotEmpty
+                    ? Icons.check_box
+                    : Icons.check_box_outline_blank,
+                  color: Theme.of(context).iconTheme.color,
+                ),
+                tooltip: selectedJobIndexes.length == filteredJobs.length && filteredJobs.isNotEmpty
+                  ? 'Deselect All'
+                  : 'Select All',
+                onPressed: () {
+                  setState(() {
+                    if (selectedJobIndexes.length == filteredJobs.length && filteredJobs.isNotEmpty) {
+                      selectedJobIndexes.clear();
+                    } else {
+                      selectedJobIndexes = filteredJobs
+                        .map((c) => jobs.indexOf(c))
+                        .toSet();
+                    }
+                  });
+                },
+              ),
             Stack(
               children: [
                 IconButton(
@@ -367,14 +415,45 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
 
                       return Column(
                         children: [
-                          JobCard(
-                            job: job,
-                            isExpanded: isExpanded,
-                            onFullDetailsPressed: () {
-                              setState(() {
-                                expandedJobId = isExpanded ? null : job.id;
-                              });
-                            },
+                          Row(
+                            children: [
+                              if (isSelectingForDownload)
+                                Checkbox(
+                                  value: selectedJobIndexes.contains(jobs.indexOf(job)),
+                                  onChanged: (checked) {
+                                    setState(() {
+                                      final idx = jobs.indexOf(job);
+                                      if (checked == true) {
+                                        selectedJobIndexes.add(idx);
+                                      } else {
+                                        selectedJobIndexes.remove(idx);
+                                      }
+                                    });
+                                  },
+                                ),
+                              Expanded(
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onLongPress: () {
+                                    if (!isSelectingForDownload) {
+                                      setState(() {
+                                        isSelectingForDownload = true;
+                                        selectedJobIndexes.add(jobs.indexOf(job));
+                                      });
+                                    }
+                                  },
+                                  child: JobCard(
+                                    job: job,
+                                    isExpanded: isExpanded,
+                                    onFullDetailsPressed: () {
+                                      setState(() {
+                                        expandedJobId = isExpanded ? null : job.id;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           if (isExpanded)
                             JobDetailsPanel(
@@ -396,6 +475,19 @@ class _JobsTabScreenState extends State<JobsTabScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  // Placeholder for download logic
+  Future<void> _downloadSelectedJobs() async {
+    if (selectedJobIndexes.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No jobs selected for download'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Downloaded ${selectedJobIndexes.length} jobs'), backgroundColor: Colors.green),
     );
   }
 }
@@ -606,6 +698,15 @@ class JobDetailsPanel extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
+                IconButton(
+                  onPressed: () async {
+                    final shareText =
+                        'Job Opportunity: ${job.title}\nCompany: ${job.company}\nLocation: ${job.location}\nSalary: ${job.salary}\nType: ${job.type}\nDescription: ${job.description}';
+                    await Share.share(shareText);
+                  },
+                  icon: const Icon(Icons.share, color: Color(0xFF0A7FF1)),
+                  tooltip: 'Share Job',
+                ),
               ],
             ),
           ),
