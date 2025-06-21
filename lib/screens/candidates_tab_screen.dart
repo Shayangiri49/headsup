@@ -8,7 +8,6 @@ import '../../data/user_role.dart';
 import 'package:excel/excel.dart' as excel;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 class CandidatesTabScreen extends StatefulWidget {
   final VoidCallback onBackToHome;
@@ -1073,7 +1072,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF000000),
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Color(0xFF000000),
                         ),
                       ),
                     ),
@@ -1106,9 +1105,9 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                   child: Text(
                     (candidate['experience'] ?? '').toString(),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontSize: 12,
-                      color: Colors.green,
-                      fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.green,
+                    fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -1125,7 +1124,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                       (candidate['role'] ?? '').toString(),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 12,
-                        color: Colors.green,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.green,
                         fontWeight: FontWeight.w500,
                       ),
                       overflow: TextOverflow.ellipsis,
