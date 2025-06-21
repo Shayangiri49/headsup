@@ -123,14 +123,6 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                       size: 24,
                     ),
                   ),
-                  Text(
-                    'Services',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
-                    ),
-                  ),
                   Row(
                     children: [
                       ValueListenableBuilder<List<NotificationItem>>(

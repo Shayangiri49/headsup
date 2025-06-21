@@ -291,18 +291,18 @@ class _ApplicationsTabScreenState extends State<ApplicationsTabScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            application['company'],
+                            application['candidateName'],
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            application['company'],
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             application['position'],
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 14),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            application['candidateName'],
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(height: 4),
                           Text(
