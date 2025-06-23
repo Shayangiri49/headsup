@@ -111,7 +111,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
           child: Container(
             width: MediaQuery.of(context).size.width * 0.9,
             padding: const EdgeInsets.all(24),
-            color: const Color(0xFFFFFFFF),
+            color: Theme.of(context).cardColor,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -229,7 +229,13 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                       ),
                       child: Text(
                         'View Resume',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12, fontWeight: FontWeight.w500),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Theme.of(context).colorScheme.primary
+                              : primaryBlue,
+                        ),
                       ),
                     ),
                   ],
@@ -287,9 +293,11 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF5F5F5),
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(context).colorScheme.surface.withOpacity(0.7)
+                                : const Color(0xFFF5F5F5),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey.withOpacity(0.3)), // BoxDecoration border OK
+                            border: Border.all(color: Theme.of(context).dividerColor), // BoxDecoration border OK
                           ),
                           child: TextField(
                             controller: notesController,
