@@ -15,6 +15,7 @@ void main() {
           theme: ThemeData(
             primaryColor: primaryBlue,
             scaffoldBackgroundColor: backgroundWhite,
+            cardColor: backgroundWhite, // Ensure all cards are pure white
             appBarTheme: const AppBarTheme(
               backgroundColor: backgroundWhite,
               elevation: 1,

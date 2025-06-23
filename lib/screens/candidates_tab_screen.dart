@@ -35,7 +35,7 @@ class _CandidatesTabScreenState extends State<CandidatesTabScreen> {
   // Light button colors
   static const Color lightGreen = Color(0xFFD1EFEA); // Interview
   static const Color lightOrange = Color(0xFFFBE9B7); // Reschedule
-  static const Color lightRed = Color(0xFFFFE8E8); // Reached
+  static const Color lightRed = Color(0xFFFFE8E8); // Reached (finalized)
 
   // Button text colors
   static const Color interviewTextColor = Color(0xFF319582);

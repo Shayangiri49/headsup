@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // Define your color palette as constants
 const Color primaryDarkBlue = Color(0xFF0A2A4E);
 const Color accentLighterBlue = Color(0xFF4A90E2);
-const Color whiteColor = Colors.white;
+const Color whiteColor = Color(0xFFFFFFFF); // Pure white (#ffffff)
 const Color lightGreyBackground = Color(0xFFF8F9FA);
 const Color googleButtonTextColor = Colors.black54;
 const Color standardTextColor = Colors.black87;

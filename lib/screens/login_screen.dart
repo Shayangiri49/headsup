@@ -153,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       width: 20,
                       height: 20,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: whiteColor,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Center(
@@ -268,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           SnackBar(
                             content: Row(
                               children: const [
-                                Icon(Icons.error, color: Colors.white),
+                                Icon(Icons.error, color: whiteColor),
                                 SizedBox(width: 8),
                                 Text('Invalid admin credentials'),
                               ],
@@ -280,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryBlue,
-                      foregroundColor: Colors.white,
+                      foregroundColor: whiteColor,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -290,7 +290,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    icon: const Icon(Icons.admin_panel_settings, color: Colors.white),
+                    icon: const Icon(Icons.admin_panel_settings, color: whiteColor),
                     label: const Text('Admin Login'),
                   ),
                 ),
